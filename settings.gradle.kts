@@ -1,4 +1,4 @@
-rootProject.name = "KotlinProject"
+rootProject.name = "Cappoeira"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -29,3 +29,5 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
+include(":androidApp")
+include(":videoPlayer")
