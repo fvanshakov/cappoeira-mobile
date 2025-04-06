@@ -4,6 +4,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
+import ru.cappoeira.app.search.di.searchScreenModule
+import ru.cappoeira.app.search.screen.SearchScreen
 import ru.cappoeira.app.videoPlayer.PlaybackView
 import ru.cappoeira.app.videoPlayer.di.videoPlayerModule
 
@@ -11,13 +13,10 @@ import ru.cappoeira.app.videoPlayer.di.videoPlayerModule
 @Preview
 fun App() {
     KoinApplication(
-        application = { modules(videoPlayerModule) }
+        application = { modules(searchScreenModule) }
     ) {
         MaterialTheme {
-            PlaybackView(
-                isCustom = false,
-                id = "TWV0YSBNZWxvbmhh"
-            )
+            SearchScreen()
         }
     }
 }

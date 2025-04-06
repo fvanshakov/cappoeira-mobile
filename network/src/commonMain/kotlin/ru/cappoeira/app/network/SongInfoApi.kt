@@ -3,6 +3,7 @@ package ru.cappoeira.app.network
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import ru.cappoeira.app.network.models.SongInfoByIdResponse
 import ru.cappoeira.app.network.models.SongInfoBySearchTextResponse
 
@@ -25,11 +26,13 @@ class SongInfoApiImpl(
 
     override suspend fun getSongsInfosByTextSearch(textSearch: String): NetworkResult<SongInfoBySearchTextResponse> {
         return safeApiCall {
-            client.get("$URL/searchText/$textSearch").body()
+            client.get("$URL/searchText/$textSearch") {
+                parameter("page", "0")
+            }.body()
         }
     }
 
     companion object {
-        private const val URL = "https://cappoeira.ru"
+        private const val URL = "https://cappoeira.ru/api"
     }
 }

@@ -51,6 +51,7 @@ kotlin {
 
             // other project modules
             implementation(projects.videoPlayer)
+            implementation(projects.search)
         }
     }
 }
