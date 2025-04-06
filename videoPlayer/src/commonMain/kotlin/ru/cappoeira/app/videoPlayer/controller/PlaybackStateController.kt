@@ -2,7 +2,7 @@ package ru.cappoeira.app.videoPlayer.controller
 
 data class PlaybackMediaItem(
     val id: String,
-    val position: Int,
+    val position: Int = 1,
     val name: String? = null,
     val url: String
 )

@@ -30,14 +30,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 import ru.cappoeira.app.videoPlayer.controller.PlaybackState
 import ru.cappoeira.app.videoPlayer.view.PlatformMediaPlayerView
 
 @Composable
 fun PlaybackView(
-    isCustom: Boolean
+    isCustom: Boolean,
+    id: String
 ) {
-    val viewModel: PlaybackViewModel = koinViewModel()
+    val viewModel: PlaybackViewModel = koinViewModel(
+        parameters = { parametersOf(id) }
+    )
     val controller = remember { viewModel.getPlatformController() }
 
     Box(
@@ -59,18 +63,22 @@ fun PlaybackView(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                PlayPauseControl(onPlayPause = { viewModel.playPause() })
+                PlayPauseControl(id = id, onPlayPause = { viewModel.playPause() })
                 Spacer(modifier = Modifier.height(8.dp))
                 PlaybackSeekBar()
             }
-            PlaybackBufferingIndicator()
+            PlaybackBufferingIndicator(id)
         }
     }
 }
 
 @Composable
-fun PlaybackBufferingIndicator() {
-    val viewModel: PlaybackViewModel = koinViewModel()
+fun PlaybackBufferingIndicator(
+    id: String
+) {
+    val viewModel: PlaybackViewModel = koinViewModel(
+        parameters = { parametersOf(id) }
+    )
     val state = viewModel.playBackStateUI.collectAsState()
     AnimatedVisibility(
         visible = state.value == PlaybackState.Buffering,
@@ -110,8 +118,13 @@ fun PlaybackSeekBar() {
 
 
 @Composable
-fun PlayPauseControl(onPlayPause: () -> Unit) {
-    val viewModel: PlaybackViewModel = koinViewModel()
+fun PlayPauseControl(
+    id: String,
+    onPlayPause: () -> Unit
+) {
+    val viewModel: PlaybackViewModel = koinViewModel(
+        parameters = { parametersOf(id) }
+    )
     val state = viewModel.playBackStateUI.collectAsState()
 
     Row(

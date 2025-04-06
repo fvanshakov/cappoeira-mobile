@@ -81,7 +81,6 @@ class Media3PlayerComponentImpl(
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setTitle(mediaItem.name)
-                    .setArtist("Artist Name")
                     .build()
             )
             .build()

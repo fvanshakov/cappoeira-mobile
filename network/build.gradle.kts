@@ -1,8 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
@@ -11,7 +9,7 @@ kotlin {
 // which platforms this KMP module supports.
 // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
-        namespace = "ru.cappoeira.app.videoPlayer"
+        namespace = "ru.cappoeira.app.network"
         compileSdk = 35
         minSdk = 24
 
@@ -32,7 +30,7 @@ kotlin {
 // A step-by-step guide on how to include this library in an XCode
 // project can be found here:
 // https://developer.android.com/kotlin/multiplatform/migrate
-    val xcfName = "videoPlayerKit"
+    val xcfName = "networkKit"
 
     iosX64 {
         binaries.framework {
@@ -60,25 +58,17 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-
-                // compose
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material)
-                implementation(compose.ui)
-                implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
-
-                // viewmodel and lifecycle
-                implementation(libs.androidx.lifecycle.viewmodel)
-                implementation(libs.androidx.lifecycle.runtime.compose)
+                implementation(libs.kotlin.stdlib)
+                implementation(libs.kotlinx.coroutines.core)
 
                 // koin
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose)
                 implementation(libs.koin.compose.viewmodel)
 
-                implementation(projects.network)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
             }
         }
 
@@ -90,14 +80,10 @@ kotlin {
 
         androidMain {
             dependencies {
-                implementation(compose.preview)
-                implementation(libs.androidx.activity.compose)
-                implementation(libs.androidx.media3.exoplayer)
-                implementation(libs.androidx.media3.session)
-                implementation(libs.androidx.media3.ui)
-                implementation(libs.androidx.media3.exoplayer.hls)
+                implementation(libs.ktor.client.okhttp)
+                implementation(libs.kotlinx.coroutines.android)
+
                 implementation(libs.koin.core)
-                implementation(projects.androidApp)
             }
         }
 
@@ -111,9 +97,10 @@ kotlin {
 
         iosMain {
             dependencies {
+                implementation(libs.ktor.client.darwin)
+
                 implementation(libs.koin.core)
             }
         }
     }
-
 }

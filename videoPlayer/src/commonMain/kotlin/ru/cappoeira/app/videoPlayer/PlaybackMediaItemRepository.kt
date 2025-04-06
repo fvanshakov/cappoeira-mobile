@@ -1,5 +1,7 @@
 package ru.cappoeira.app.videoPlayer
 
+import ru.cappoeira.app.network.NetworkResult
+import ru.cappoeira.app.network.SongInfoApi
 import ru.cappoeira.app.videoPlayer.controller.PlaybackMediaItem
 
 sealed class MediaItemDataState {
@@ -9,19 +11,27 @@ sealed class MediaItemDataState {
 }
 
 interface PlaybackMediaItemRepository {
-    suspend fun fetchMediaItems(): MediaItemDataState
+    suspend fun fetchMediaItems(id: String): MediaItemDataState
 }
 
-class PlaybackMediaItemRepositoryImpl : PlaybackMediaItemRepository {
-    private val remoteDataSourceData = mutableListOf(
-        PlaybackMediaItem(
-            id = "1",
-            position = 1,
-            url = "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8"
-        ),
-    )
+class PlaybackMediaItemRepositoryImpl(
+    private val songInfoApi: SongInfoApi
+) : PlaybackMediaItemRepository {
 
-    override suspend fun fetchMediaItems(): MediaItemDataState {
-        return MediaItemDataState.Success(remoteDataSourceData)
+    override suspend fun fetchMediaItems(id: String): MediaItemDataState {
+        return songInfoApi.getSongInfoById(id).let { res ->
+            when (res) {
+                is NetworkResult.Success -> {
+                    val item = res.data.videoUrl?.let { url ->
+                        PlaybackMediaItem(
+                            id = res.data.id,
+                            url = url,
+                        )
+                    }
+                    MediaItemDataState.Success(listOfNotNull(item))
+                }
+                is NetworkResult.Error -> MediaItemDataState.Failure
+            }
+        }
     }
 }
