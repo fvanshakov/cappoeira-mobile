@@ -26,6 +26,7 @@ class SongInfoViewModel(
                         _uiState.value = SongInfoUIState.Success(
                             callResult.data.format()
                         )
+                        // https://storage.yandexcloud.net/videos-hls/Meta%20Melonha/master.m3u8
                     }
                     is NetworkResult.Error -> {
                         _uiState.value = SongInfoUIState.Error(

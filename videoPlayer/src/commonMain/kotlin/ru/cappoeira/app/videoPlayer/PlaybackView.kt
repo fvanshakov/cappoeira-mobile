@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,13 +39,19 @@ import ru.cappoeira.app.videoPlayer.view.PlatformMediaPlayerView
 fun PlaybackView(
     isCustom: Boolean,
     url: String,
-    id: String
-) {
-    val viewModel: PlaybackViewModel = koinViewModel(
+    id: String,
+    viewModel: PlaybackViewModel = koinViewModel(
         parameters = { parametersOf(url, id) }
     )
+) {
     val controller = remember { viewModel.getPlatformController() }
 
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(16.dp)
+            .background(Color.Black)
+    )
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -71,6 +78,12 @@ fun PlaybackView(
             PlaybackBufferingIndicator(url = url, id = id)
         }
     }
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(16.dp)
+            .background(Color.Black)
+    )
 }
 
 @Composable

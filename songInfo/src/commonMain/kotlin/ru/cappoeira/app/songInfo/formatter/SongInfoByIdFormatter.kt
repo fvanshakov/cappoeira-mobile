@@ -9,7 +9,8 @@ object SongInfoByIdFormatter {
         return with(this) {
             SongInfoByIdViewObject(
                 songName = songName,
-                videoUrl = videoUrl
+                videoUrl = videoUrl,
+                id = id
             )
         }
     }
