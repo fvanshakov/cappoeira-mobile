@@ -12,7 +12,8 @@ import ru.cappoeira.app.videoPlayer.controller.PlaybackStateController
 
 class PlaybackViewModel(
     private val playbackStateController: PlaybackStateController,
-    private val playbackMediaItemRepository: PlaybackMediaItemRepository
+    private val url: String,
+    private val id: String
 ) : ViewModel() {
     private val _playBackState = MutableStateFlow<PlaybackState>(PlaybackState.Buffering)
     private val _progressState = MutableStateFlow(0F)
@@ -28,13 +29,16 @@ class PlaybackViewModel(
         initialise()
     }
 
-    fun initialise() {
+    private fun initialise() {
         viewModelScope.launch {
-            when (val results = playbackMediaItemRepository.fetchMediaItems()) {
-                is MediaItemDataState.Failure -> PlaybackState.Error("Failed to load playback items")
-                is MediaItemDataState.Loading -> _playBackState.value = PlaybackState.Buffering
-                is MediaItemDataState.Success -> handleStartPlayback(results.items)
-            }
+            handleStartPlayback(
+                listOf(
+                    PlaybackMediaItem(
+                        id = id,
+                        url = url
+                    )
+                )
+            )
         }
     }
 
