@@ -59,9 +59,12 @@ fun SearchScreen(
                     )
                 } else {
                     LazyColumn {
-                        items(songs) { song ->
+                        itemsIndexed(songs) { index, song ->
                             SongCard(song, onClickOnCard)
                             Spacer(Modifier.height(8.dp))
+                            if (index == songs.lastIndex - 3) {
+                                 viewModel.onLimitReached(search)
+                            }
                         }
                     }
                 }

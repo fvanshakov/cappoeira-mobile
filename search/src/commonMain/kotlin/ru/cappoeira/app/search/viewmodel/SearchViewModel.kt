@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import ru.cappoeira.app.network.NetworkResult
 import ru.cappoeira.app.network.SongInfoApi
 import ru.cappoeira.app.search.formatter.SongInfoBySearchFormatter.format
+import ru.cappoeira.app.search.models.SongInfoViewObject
 import ru.cappoeira.app.search.state.SearchUiState
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -23,6 +24,9 @@ class SearchViewModel(
 
     private val _searchText = MutableStateFlow("")
     private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Success(emptyList()))
+    private val _songs = MutableStateFlow(emptyList<SongInfoViewObject>())
+    private val _isPaginationLoading = MutableStateFlow(false)
+    private var page: Int = 0
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     init {
@@ -30,8 +34,11 @@ class SearchViewModel(
             .debounce(250)
             .distinctUntilChanged()
             .onEach { query ->
+                page = 0
+                _isPaginationLoading.value = false
+                _songs.value = emptyList()
                 if (query.isBlank()) {
-                    _uiState.value = SearchUiState.Success(emptyList())
+                    _uiState.value = SearchUiState.Success(_songs.value)
                     return@onEach
                 }
                 fetchUsers(query)
@@ -44,26 +51,57 @@ class SearchViewModel(
     }
 
     @OptIn(ExperimentalEncodingApi::class)
+    private suspend fun loadPage(query: String) {
+        try {
+            val searchText = Base64.encode(query.encodeToByteArray())
+            when(val callResult = songInfoApi.getSongsInfosByTextSearch(searchText, page)) {
+                is NetworkResult.Success -> {
+                    val newResult = callResult.data.songs.map { it.format() }
+                    page = if (newResult.size < 10) {
+                        -1
+                    } else {
+                        page + 1
+                    }
+                    _songs.value += newResult
+                    _uiState.value = SearchUiState.Success(
+                        _songs.value
+                    )
+                }
+                is NetworkResult.Error -> {
+                    resetStateOnError()
+                    _uiState.value = SearchUiState.Error(
+                        callResult.message
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            resetStateOnError()
+            _uiState.value = SearchUiState.Error("Ошибка загрузки: ${e.message}")
+        }
+    }
+
+    fun onLimitReached(query: String) {
+        if (page == -1 || _uiState.value is SearchUiState.Loading || _isPaginationLoading.value) {
+            return
+        }
+        viewModelScope.launch {
+            _isPaginationLoading.value = true
+            loadPage(query)
+            _isPaginationLoading.value = false
+        }
+    }
+
     private fun fetchUsers(query: String) {
         viewModelScope.launch {
+            _songs.value = emptyList()
             _uiState.value = SearchUiState.Loading
-            try {
-                val searchText = Base64.encode(query.encodeToByteArray())
-                when(val callResult = songInfoApi.getSongsInfosByTextSearch(searchText)) {
-                    is NetworkResult.Success -> {
-                        _uiState.value = SearchUiState.Success(
-                            callResult.data.songs.map { it.format() }
-                        )
-                    }
-                    is NetworkResult.Error -> {
-                        _uiState.value = SearchUiState.Error(
-                            callResult.message
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                _uiState.value = SearchUiState.Error("Ошибка загрузки: ${e.message}")
-            }
+            page = 0
+            loadPage(query)
         }
+    }
+
+    private fun resetStateOnError() {
+        page = -1
+        _songs.value = emptyList()
     }
 }
