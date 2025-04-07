@@ -31,3 +31,6 @@ dependencyResolutionManagement {
 include(":composeApp")
 include(":androidApp")
 include(":videoPlayer")
+include(":network")
+include(":search")
+include(":songInfo")

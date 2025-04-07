@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,16 +31,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 import ru.cappoeira.app.videoPlayer.controller.PlaybackState
 import ru.cappoeira.app.videoPlayer.view.PlatformMediaPlayerView
 
 @Composable
 fun PlaybackView(
-    isCustom: Boolean
+    isCustom: Boolean,
+    url: String,
+    id: String,
+    viewModel: PlaybackViewModel = koinViewModel(
+        parameters = { parametersOf(url, id) }
+    )
 ) {
-    val viewModel: PlaybackViewModel = koinViewModel()
     val controller = remember { viewModel.getPlatformController() }
 
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(16.dp)
+            .background(Color.Black)
+    )
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -59,18 +71,29 @@ fun PlaybackView(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                PlayPauseControl(onPlayPause = { viewModel.playPause() })
+                PlayPauseControl(url = url, id = id, onPlayPause = { viewModel.playPause() })
                 Spacer(modifier = Modifier.height(8.dp))
                 PlaybackSeekBar()
             }
-            PlaybackBufferingIndicator()
+            PlaybackBufferingIndicator(url = url, id = id)
         }
     }
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(16.dp)
+            .background(Color.Black)
+    )
 }
 
 @Composable
-fun PlaybackBufferingIndicator() {
-    val viewModel: PlaybackViewModel = koinViewModel()
+fun PlaybackBufferingIndicator(
+    id: String,
+    url: String
+) {
+    val viewModel: PlaybackViewModel = koinViewModel(
+        parameters = { parametersOf(url, id) }
+    )
     val state = viewModel.playBackStateUI.collectAsState()
     AnimatedVisibility(
         visible = state.value == PlaybackState.Buffering,
@@ -110,8 +133,14 @@ fun PlaybackSeekBar() {
 
 
 @Composable
-fun PlayPauseControl(onPlayPause: () -> Unit) {
-    val viewModel: PlaybackViewModel = koinViewModel()
+fun PlayPauseControl(
+    url: String,
+    id: String,
+    onPlayPause: () -> Unit
+) {
+    val viewModel: PlaybackViewModel = koinViewModel(
+        parameters = { parametersOf(url, id) }
+    )
     val state = viewModel.playBackStateUI.collectAsState()
 
     Row(
