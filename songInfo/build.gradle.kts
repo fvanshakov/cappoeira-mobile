@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
-    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
@@ -10,7 +11,7 @@ kotlin {
 // which platforms this KMP module supports.
 // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
-        namespace = "ru.cappoeira.app.network"
+        namespace = "ru.cappoeira.app.songInfo"
         compileSdk = 35
         minSdk = 24
 
@@ -31,7 +32,7 @@ kotlin {
 // A step-by-step guide on how to include this library in an XCode
 // project can be found here:
 // https://developer.android.com/kotlin/multiplatform/migrate
-    val xcfName = "networkKit"
+    val xcfName = "songInfoKit"
 
     iosX64 {
         binaries.framework {
@@ -60,18 +61,25 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                implementation(libs.kotlinx.coroutines.core)
+                // compose
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+
+                // viewmodel and lifecycle
+                implementation(libs.androidx.lifecycle.viewmodel)
+                implementation(libs.androidx.lifecycle.runtime.compose)
 
                 // koin
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose)
                 implementation(libs.koin.compose.viewmodel)
 
-                implementation(libs.ktor.client.core)
-                implementation(libs.ktor.client.content.negotiation)
-                implementation(libs.ktor.serialization.kotlinx.json)
-                implementation(libs.ktor.client.json)
-                implementation(libs.ktor.client.serialization)
+                implementation(projects.videoPlayer)
+                implementation(projects.network)
             }
         }
 
@@ -83,10 +91,13 @@ kotlin {
 
         androidMain {
             dependencies {
-                implementation(libs.ktor.client.okhttp)
                 implementation(libs.kotlinx.coroutines.android)
 
                 implementation(libs.koin.core)
+
+                implementation(compose.preview)
+                implementation(libs.androidx.activity.compose)
+                implementation(libs.androidx.material3.android)
             }
         }
 
@@ -100,10 +111,9 @@ kotlin {
 
         iosMain {
             dependencies {
-                implementation(libs.ktor.client.darwin)
-
                 implementation(libs.koin.core)
             }
         }
     }
+
 }

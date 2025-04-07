@@ -15,7 +15,10 @@ import ru.cappoeira.app.search.state.SearchUiState
 import ru.cappoeira.app.search.viewmodel.SearchViewModel
 
 @Composable
-fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
+fun SearchScreen(
+    viewModel: SearchViewModel = koinViewModel(),
+    onClickOnCard: (id: String) -> Unit
+) {
     val state by viewModel.uiState.collectAsState()
     var search by remember { mutableStateOf("") }
 
@@ -57,7 +60,7 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
                 } else {
                     LazyColumn {
                         items(songs) { song ->
-                            SongCard(song)
+                            SongCard(song, onClickOnCard)
                             Spacer(Modifier.height(8.dp))
                         }
                     }

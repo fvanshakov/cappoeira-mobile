@@ -37,10 +37,11 @@ import ru.cappoeira.app.videoPlayer.view.PlatformMediaPlayerView
 @Composable
 fun PlaybackView(
     isCustom: Boolean,
+    url: String,
     id: String
 ) {
     val viewModel: PlaybackViewModel = koinViewModel(
-        parameters = { parametersOf(id) }
+        parameters = { parametersOf(url, id) }
     )
     val controller = remember { viewModel.getPlatformController() }
 
@@ -63,21 +64,22 @@ fun PlaybackView(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                PlayPauseControl(id = id, onPlayPause = { viewModel.playPause() })
+                PlayPauseControl(url = url, id = id, onPlayPause = { viewModel.playPause() })
                 Spacer(modifier = Modifier.height(8.dp))
                 PlaybackSeekBar()
             }
-            PlaybackBufferingIndicator(id)
+            PlaybackBufferingIndicator(url = url, id = id)
         }
     }
 }
 
 @Composable
 fun PlaybackBufferingIndicator(
-    id: String
+    id: String,
+    url: String
 ) {
     val viewModel: PlaybackViewModel = koinViewModel(
-        parameters = { parametersOf(id) }
+        parameters = { parametersOf(url, id) }
     )
     val state = viewModel.playBackStateUI.collectAsState()
     AnimatedVisibility(
@@ -119,11 +121,12 @@ fun PlaybackSeekBar() {
 
 @Composable
 fun PlayPauseControl(
+    url: String,
     id: String,
     onPlayPause: () -> Unit
 ) {
     val viewModel: PlaybackViewModel = koinViewModel(
-        parameters = { parametersOf(id) }
+        parameters = { parametersOf(url, id) }
     )
     val state = viewModel.playBackStateUI.collectAsState()
 

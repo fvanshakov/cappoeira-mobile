@@ -49,9 +49,16 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
 
+            // navigation
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.transitions)
+            implementation(libs.voyager.screenmodel)
+            implementation(libs.voyager.koin)
+            implementation(libs.voyager.livedata)
+
             // other project modules
-            implementation(projects.videoPlayer)
             implementation(projects.search)
+            implementation(projects.songInfo)
         }
     }
 }

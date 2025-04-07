@@ -4,16 +4,13 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import ru.cappoeira.app.network.di.networkModule
-import ru.cappoeira.app.videoPlayer.PlaybackMediaItemRepository
-import ru.cappoeira.app.videoPlayer.PlaybackMediaItemRepositoryImpl
 import ru.cappoeira.app.videoPlayer.PlaybackViewModel
 
 expect val platformVideoPlayerCoreModule: Module
 
 val commonVideoPlayerModule = module {
     includes(networkModule)
-    single<PlaybackMediaItemRepository> { PlaybackMediaItemRepositoryImpl(get()) }
-    viewModel { (id: String) -> PlaybackViewModel(get(), get(), id) }
+    viewModel { (url: String, id: String) -> PlaybackViewModel(get(),url, id) }
 }
 
 val videoPlayerModule: Module

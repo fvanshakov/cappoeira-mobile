@@ -1,5 +1,6 @@
 package ru.cappoeira.app.search.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,7 +14,10 @@ import androidx.compose.ui.unit.dp
 import ru.cappoeira.app.search.models.SongInfoViewObject
 
 @Composable
-fun SongCard(songInfoVO: SongInfoViewObject) {
+fun SongCard(
+    songInfoVO: SongInfoViewObject,
+    onClickOnCard: (id: String) -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium
@@ -23,6 +27,7 @@ fun SongCard(songInfoVO: SongInfoViewObject) {
                 .height(60.dp)
                 .fillMaxWidth()
                 .padding(16.dp)
+                .clickable { onClickOnCard(songInfoVO.id) }
         ) {
             Text(
                 text = songInfoVO.songName,
