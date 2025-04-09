@@ -11,4 +11,14 @@ actual object Analytics {
         val configuration = AMAAppMetricaConfiguration(aPIKey = "")
         AMAAppMetrica.activateWithConfiguration(configuration)
     }
+
+    actual fun sendEvent(
+        eventName: String,
+        params: Map<Any?, *>
+    ) {
+        AMAAppMetrica.reportEvent(
+            name = eventName,
+            parameters = params
+        ) {  }
+    }
 }

@@ -81,6 +81,11 @@ class PlaybackViewModel(
     }
 
     override fun onCleared() {
+        playbackStateController.pause(
+            playbackState = {
+                _playBackState.value = it
+            }
+        )
         viewModelScope.cancel()
         super.onCleared()
     }

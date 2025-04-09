@@ -17,7 +17,7 @@ import ru.cappoeira.app.search.viewmodel.SearchViewModel
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = koinViewModel(),
-    onClickOnCard: (id: String) -> Unit
+    onClickOnCard: (id: String, songName: String) -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
     var search by remember { mutableStateOf("") }
@@ -34,7 +34,7 @@ fun SearchScreen(
                 viewModel.onSearchTextChanged(it)
             },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Поиск") },
+            label = { Text("ПОИСК") },
             singleLine = true
         )
 

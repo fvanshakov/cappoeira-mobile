@@ -16,7 +16,7 @@ import ru.cappoeira.app.search.models.SongInfoViewObject
 @Composable
 fun SongCard(
     songInfoVO: SongInfoViewObject,
-    onClickOnCard: (id: String) -> Unit
+    onClickOnCard: (id: String, songName: String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -27,7 +27,7 @@ fun SongCard(
                 .height(60.dp)
                 .fillMaxWidth()
                 .padding(16.dp)
-                .clickable { onClickOnCard(songInfoVO.id) }
+                .clickable { onClickOnCard(songInfoVO.id, songInfoVO.songName) }
         ) {
             Text(
                 text = songInfoVO.songName,

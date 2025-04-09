@@ -5,4 +5,11 @@ actual object Analytics {
     actual fun initialize() {
 
     }
+
+    actual fun sendEvent(
+        eventName: String,
+        params: Map<Any?, *>
+    ) {
+
+    }
 }

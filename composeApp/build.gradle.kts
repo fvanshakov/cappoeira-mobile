@@ -60,6 +60,7 @@ kotlin {
             implementation(projects.search)
             implementation(projects.songInfo)
             implementation(projects.analytics)
+            implementation(projects.topbar)
         }
         iosMain.dependencies {
             implementation(projects.analytics)

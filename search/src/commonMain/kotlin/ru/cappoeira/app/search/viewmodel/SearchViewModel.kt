@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ru.cappoeira.app.analytics.Analytics
 import ru.cappoeira.app.network.NetworkResult
 import ru.cappoeira.app.network.SongInfoApi
 import ru.cappoeira.app.search.formatter.SongInfoBySearchFormatter.format
@@ -30,6 +31,12 @@ class SearchViewModel(
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     init {
+        Analytics.sendEvent(
+            eventName = "openScreen",
+            params = mapOf(
+                "screen" to "Search"
+            )
+        )
         _searchText
             .debounce(250)
             .distinctUntilChanged()
@@ -37,10 +44,6 @@ class SearchViewModel(
                 page = 0
                 _isPaginationLoading.value = false
                 _songs.value = emptyList()
-                if (query.isBlank()) {
-                    _uiState.value = SearchUiState.Success(_songs.value)
-                    return@onEach
-                }
                 fetchUsers(query)
             }
             .launchIn(viewModelScope)
@@ -92,6 +95,13 @@ class SearchViewModel(
     }
 
     private fun fetchUsers(query: String) {
+        Analytics.sendEvent(
+            eventName = "searchSong",
+            params = mapOf(
+                "searchText" to query,
+                "screen" to "Search"
+            )
+        )
         viewModelScope.launch {
             _songs.value = emptyList()
             _uiState.value = SearchUiState.Loading
