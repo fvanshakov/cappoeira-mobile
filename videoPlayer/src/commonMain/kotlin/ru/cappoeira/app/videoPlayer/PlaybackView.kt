@@ -23,6 +23,7 @@ import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -40,9 +41,7 @@ fun PlaybackView(
     isCustom: Boolean,
     url: String,
     id: String,
-    viewModel: PlaybackViewModel = koinViewModel(
-        parameters = { parametersOf(url, id) }
-    )
+    viewModel: PlaybackViewModel
 ) {
     val controller = remember { viewModel.getPlatformController() }
 

@@ -79,6 +79,7 @@ kotlin {
                 implementation(libs.koin.compose.viewmodel)
 
                 implementation(projects.network)
+                implementation(projects.analytics)
             }
         }
 
@@ -111,6 +112,7 @@ kotlin {
         iosMain {
             dependencies {
                 implementation(libs.koin.core)
+                implementation(projects.analytics)
             }
         }
     }

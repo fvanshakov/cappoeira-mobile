@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
+import platform.AVFoundation.pause
 import platform.AVFoundation.play
 import platform.AVKit.AVPlayerViewController
 import platform.CoreGraphics.CGRectMake
@@ -34,7 +35,7 @@ actual fun PlatformMediaPlayerView(
         update = {
             avPlayerViewController.player?.play()
         },
-        onRelease = {  },
+        onRelease = { avPlayerViewController.player?.pause() },
         modifier = Modifier.fillMaxWidth().fillMaxHeight(0.4f)
     )
 }

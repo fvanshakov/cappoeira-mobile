@@ -80,6 +80,7 @@ kotlin {
 
                 implementation(projects.videoPlayer)
                 implementation(projects.network)
+                implementation(projects.analytics)
             }
         }
 
