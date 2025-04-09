@@ -123,7 +123,7 @@ kotlin {
             isStatic = false
             // Dependency export
             // Uncomment and specify another project module if you have one:
-            // export(project(":<your other KMP module>"))
+            export(project(projects.composeApp.path))
             transitiveExport = false // This is default.
         }
 
