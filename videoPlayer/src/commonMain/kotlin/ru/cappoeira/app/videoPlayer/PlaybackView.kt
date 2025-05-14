@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,9 +38,7 @@ fun PlaybackView(
     isCustom: Boolean,
     url: String,
     id: String,
-    viewModel: PlaybackViewModel = koinViewModel(
-        parameters = { parametersOf(url, id) }
-    )
+    viewModel: PlaybackViewModel
 ) {
     val controller = remember { viewModel.getPlatformController() }
 
@@ -61,22 +57,9 @@ fun PlaybackView(
     ) {
         PlatformMediaPlayerView(
             modifier = Modifier,
-            controller
+            controller,
+            hidePlayback = isCustom
         )
-
-        if (isCustom) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                PlayPauseControl(url = url, id = id, onPlayPause = { viewModel.playPause() })
-                Spacer(modifier = Modifier.height(8.dp))
-                PlaybackSeekBar()
-            }
-            PlaybackBufferingIndicator(url = url, id = id)
-        }
     }
     Box(
         Modifier

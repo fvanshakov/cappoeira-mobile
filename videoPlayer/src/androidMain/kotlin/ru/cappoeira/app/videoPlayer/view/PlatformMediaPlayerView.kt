@@ -14,7 +14,7 @@ import ru.cappoeira.app.videoPlayer.controller.PlaybackStateController
 actual fun PlatformMediaPlayerView(
     modifier: Modifier,
     playbackStateController: PlaybackStateController,
-    isCustom: Boolean
+    hidePlayback: Boolean
 ) {
     val controller by remember {
         mutableStateOf(playbackStateController.getController())
@@ -23,7 +23,7 @@ actual fun PlatformMediaPlayerView(
         factory = { ctx ->
             PlayerView(ctx).apply {
                 player = controller
-                useController = !isCustom
+                useController = !hidePlayback
             }
         },
         modifier = Modifier.wrapContentSize()

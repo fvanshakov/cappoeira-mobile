@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
+import platform.AVFoundation.pause
 import platform.AVFoundation.play
 import platform.AVKit.AVPlayerViewController
 import platform.CoreGraphics.CGRectMake
@@ -18,11 +19,11 @@ import ru.cappoeira.app.videoPlayer.controller.PlaybackStateController
 actual fun PlatformMediaPlayerView(
     modifier: Modifier,
     playbackStateController: PlaybackStateController,
-    isCustom: Boolean
+    hidePlayback: Boolean
 ) {
     val avPlayerViewController = remember { AVPlayerViewController() }
     avPlayerViewController.player = remember { playbackStateController.avPlayer }
-    avPlayerViewController.showsPlaybackControls = !isCustom
+    avPlayerViewController.showsPlaybackControls = hidePlayback
     avPlayerViewController.view.setFrame(CGRectMake(0.0, 0.0, 0.10, 0.10))
 
     UIKitView(
@@ -34,7 +35,7 @@ actual fun PlatformMediaPlayerView(
         update = {
             avPlayerViewController.player?.play()
         },
-        onRelease = {  },
+        onRelease = { avPlayerViewController.player?.pause() },
         modifier = Modifier.fillMaxWidth().fillMaxHeight(0.4f)
     )
 }

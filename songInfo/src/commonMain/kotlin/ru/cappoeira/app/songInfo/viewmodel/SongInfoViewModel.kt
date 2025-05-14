@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.cappoeira.app.analytics.Analytics
 import ru.cappoeira.app.network.NetworkResult
 import ru.cappoeira.app.network.SongInfoApi
 import ru.cappoeira.app.songInfo.formatter.SongInfoByIdFormatter.format
@@ -19,6 +20,12 @@ class SongInfoViewModel(
     val uiState: StateFlow<SongInfoUIState> = _uiState.asStateFlow()
 
     init {
+        Analytics.sendEvent(
+            eventName = "openScreen",
+            params = mapOf(
+                "screen" to "SongInfo"
+            )
+        )
         viewModelScope.launch {
             try {
                 when(val callResult = songInfoApi.getSongInfoById(id)) {
@@ -38,5 +45,9 @@ class SongInfoViewModel(
                 _uiState.value = SongInfoUIState.Error("Ошибка загрузки: ${e.message}")
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
     }
 }
