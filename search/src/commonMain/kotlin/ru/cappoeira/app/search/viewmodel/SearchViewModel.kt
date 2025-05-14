@@ -38,7 +38,7 @@ class SearchViewModel(
             )
         )
         _searchText
-            .debounce(250)
+            .debounce(400)
             .distinctUntilChanged()
             .onEach { query ->
                 page = 0

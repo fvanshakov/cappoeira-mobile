@@ -80,6 +80,7 @@ kotlin {
 
                 implementation(projects.network)
                 implementation(projects.analytics)
+                implementation(projects.designSystem)
             }
         }
 

@@ -19,11 +19,11 @@ import ru.cappoeira.app.videoPlayer.controller.PlaybackStateController
 actual fun PlatformMediaPlayerView(
     modifier: Modifier,
     playbackStateController: PlaybackStateController,
-    isCustom: Boolean
+    hidePlayback: Boolean
 ) {
     val avPlayerViewController = remember { AVPlayerViewController() }
     avPlayerViewController.player = remember { playbackStateController.avPlayer }
-    avPlayerViewController.showsPlaybackControls = !isCustom
+    avPlayerViewController.showsPlaybackControls = hidePlayback
     avPlayerViewController.view.setFrame(CGRectMake(0.0, 0.0, 0.10, 0.10))
 
     UIKitView(
