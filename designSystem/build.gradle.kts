@@ -11,7 +11,7 @@ kotlin {
 // which platforms this KMP module supports.
 // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
-        namespace = "ru.cappoeira.app.songInfo"
+        namespace = "ru.cappoeira.app.designSystem"
         compileSdk = 35
         minSdk = 24
 
@@ -32,7 +32,7 @@ kotlin {
 // A step-by-step guide on how to include this library in an XCode
 // project can be found here:
 // https://developer.android.com/kotlin/multiplatform/migrate
-    val xcfName = "songInfoKit"
+    val xcfName = "designSystemKit"
 
     iosX64 {
         binaries.framework {
@@ -68,20 +68,6 @@ kotlin {
                 implementation(compose.ui)
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
-
-                // viewmodel and lifecycle
-                implementation(libs.androidx.lifecycle.viewmodel)
-                implementation(libs.androidx.lifecycle.runtime.compose)
-
-                // koin
-                implementation(libs.koin.core)
-                implementation(libs.koin.compose)
-                implementation(libs.koin.compose.viewmodel)
-
-                implementation(projects.videoPlayer)
-                implementation(projects.network)
-                implementation(projects.analytics)
-                implementation(projects.designSystem)
             }
         }
 
@@ -93,13 +79,7 @@ kotlin {
 
         androidMain {
             dependencies {
-                implementation(libs.kotlinx.coroutines.android)
-
-                implementation(libs.koin.core)
-
                 implementation(compose.preview)
-                implementation(libs.androidx.activity.compose)
-                implementation(libs.androidx.material3.android)
             }
         }
 
@@ -113,7 +93,11 @@ kotlin {
 
         iosMain {
             dependencies {
-                implementation(libs.koin.core)
+                // Add iOS-specific dependencies here. This a source set created by Kotlin Gradle
+                // Plugin (KGP) that each specific iOS target (e.g., iosX64) depends on as
+                // part of KMP’s default source set hierarchy. Note that this source set depends
+                // on common by default and will correctly pull the iOS artifacts of any
+                // KMP dependencies declared in commonMain.
             }
         }
     }

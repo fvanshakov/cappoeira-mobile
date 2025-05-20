@@ -18,17 +18,13 @@ class SongInfoNavScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        ScaffoldWithToolbar(
-            screenName = songName.uppercase(),
-            onBackButton = { navigator.pop() },
-            content = {
-                SongInfoScreen(
-                    koinViewModel(
-                        key = "${SongInfoViewModel::class}$id",
-                        parameters = { parametersOf(id) }
-                    )
-                )
-            }
+        SongInfoScreen(
+            songName,
+            { navigator.pop() },
+            koinViewModel(
+                key = "${SongInfoViewModel::class}$id",
+                parameters = { parametersOf(id) }
+            )
         )
     }
 }

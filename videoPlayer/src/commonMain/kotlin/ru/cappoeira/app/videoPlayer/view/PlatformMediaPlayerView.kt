@@ -8,5 +8,5 @@ import ru.cappoeira.app.videoPlayer.controller.PlaybackStateController
 expect fun PlatformMediaPlayerView(
     modifier: Modifier,
     playbackStateController: PlaybackStateController,
-    isCustom: Boolean = false
+    hidePlayback: Boolean = false
 )

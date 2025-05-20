@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,7 +21,6 @@ import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -60,22 +57,9 @@ fun PlaybackView(
     ) {
         PlatformMediaPlayerView(
             modifier = Modifier,
-            controller
+            controller,
+            hidePlayback = isCustom
         )
-
-        if (isCustom) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                PlayPauseControl(url = url, id = id, onPlayPause = { viewModel.playPause() })
-                Spacer(modifier = Modifier.height(8.dp))
-                PlaybackSeekBar()
-            }
-            PlaybackBufferingIndicator(url = url, id = id)
-        }
     }
     Box(
         Modifier

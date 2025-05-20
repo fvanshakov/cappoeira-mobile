@@ -38,7 +38,7 @@ class SearchViewModel(
             )
         )
         _searchText
-            .debounce(250)
+            .debounce(400)
             .distinctUntilChanged()
             .onEach { query ->
                 page = 0
@@ -55,8 +55,31 @@ class SearchViewModel(
 
     @OptIn(ExperimentalEncodingApi::class)
     private suspend fun loadPage(query: String) {
-        try {
-            val searchText = Base64.encode(query.encodeToByteArray())
+
+        suspend fun getAllSongs() {
+            when(val callResult = songInfoApi.getAllSongs(page)) {
+                is NetworkResult.Success -> {
+                    val newResult = callResult.data.songs.map { it.format() }
+                    page = if (newResult.size < 10) {
+                        -1
+                    } else {
+                        page + 1
+                    }
+                    _songs.value += newResult
+                    _uiState.value = SearchUiState.Success(
+                        _songs.value
+                    )
+                }
+                is NetworkResult.Error -> {
+                    resetStateOnError()
+                    _uiState.value = SearchUiState.Error(
+                        callResult.message
+                    )
+                }
+            }
+        }
+
+        suspend fun getSongsBySearchText(searchText: String) {
             when(val callResult = songInfoApi.getSongsInfosByTextSearch(searchText, page)) {
                 is NetworkResult.Success -> {
                     val newResult = callResult.data.songs.map { it.format() }
@@ -77,6 +100,16 @@ class SearchViewModel(
                     )
                 }
             }
+        }
+
+        try {
+            val searchText = Base64.encode(query.encodeToByteArray())
+            if (searchText.isEmpty()) {
+                getAllSongs()
+            } else {
+                getSongsBySearchText(searchText)
+            }
+
         } catch (e: Exception) {
             resetStateOnError()
             _uiState.value = SearchUiState.Error("Ошибка загрузки: ${e.message}")
