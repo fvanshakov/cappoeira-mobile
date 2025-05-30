@@ -1,9 +1,41 @@
 package ru.cappoeira.app.search.state
 
+import ru.cappoeira.app.search.SongType
 import ru.cappoeira.app.search.models.SongInfoViewObject
 
-sealed class SearchUiState {
-    object Loading : SearchUiState()
-    data class Success(val songs: List<SongInfoViewObject>) : SearchUiState()
-    data class Error(val message: String) : SearchUiState()
+data class SearchUiState(
+    val isSkeletonShown: Boolean,
+    val error: SearchUiErrorState?,
+    val corridoState: SearchUiSongListState,
+    val ladainhaState: SearchUiSongListState,
+    val chosenType: SongType,
+) {
+
+    data class SearchUiSongListState(
+        val songType: SongType,
+        val songs: List<SongInfoViewObject>,
+        val isLoading: Boolean
+    )
+
+    data class SearchUiErrorState(
+        val errorMessage: String,
+    )
+
+    companion object {
+        val DEFAULT = SearchUiState(
+            isSkeletonShown = true,
+            error = null,
+            chosenType = SongType.CORRIDO,
+            corridoState = SearchUiSongListState(
+                songType = SongType.CORRIDO,
+                songs = emptyList(),
+                isLoading = false
+            ),
+            ladainhaState = SearchUiSongListState(
+                songType = SongType.LADAINHA,
+                songs = emptyList(),
+                isLoading = false
+            )
+        )
+    }
 }

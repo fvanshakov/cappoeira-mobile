@@ -12,9 +12,16 @@ interface SongInfoApi {
 
     suspend fun getSongInfoById(id: String): NetworkResult<SongInfoByIdResponse>
 
-    suspend fun getSongsInfosByTextSearch(textSearch: String, page: Int): NetworkResult<SongInfoBySearchTextResponse>
+    suspend fun getSongsInfosByTextSearch(
+        textSearch: String,
+        songType: String,
+        page: Int
+    ): NetworkResult<SongInfoBySearchTextResponse>
 
-    suspend fun getAllSongs(page: Int): NetworkResult<AllSongsResponse>
+    suspend fun getAllSongs(
+        page: Int,
+        songType: String
+    ): NetworkResult<AllSongsResponse>
 }
 
 open class SongInfoApiImpl(
@@ -27,18 +34,27 @@ open class SongInfoApiImpl(
         }
     }
 
-    override suspend fun getSongsInfosByTextSearch(textSearch: String,  page: Int): NetworkResult<SongInfoBySearchTextResponse> {
+    override suspend fun getSongsInfosByTextSearch(
+        textSearch: String,
+        songType: String,
+        page: Int
+    ): NetworkResult<SongInfoBySearchTextResponse> {
         return safeApiCall {
             client.get("$URL/searchText/$textSearch") {
                 parameter("page", page.toString())
+                parameter("songType", songType)
             }.body()
         }
     }
 
-    override suspend fun getAllSongs(page: Int): NetworkResult<AllSongsResponse> {
+    override suspend fun getAllSongs(
+        page: Int,
+        songType: String
+    ): NetworkResult<AllSongsResponse> {
         return safeApiCall {
             client.get("$URL/allSongs") {
                 parameter("page", page.toString())
+                parameter("songType", songType)
             }.body()
         }
     }

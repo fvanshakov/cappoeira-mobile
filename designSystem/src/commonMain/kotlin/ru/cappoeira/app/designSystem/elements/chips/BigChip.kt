@@ -34,7 +34,7 @@ fun BigChip(
 
     Row(
         modifier = Modifier
-            .padding(end = 8.dp)
+            .padding(16.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(
                 color = if (isSelected) DesignColors.Orange else Color.Transparent
