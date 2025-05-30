@@ -6,10 +6,10 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): NetworkResult<T> {
         NetworkResult.Success(result)
     } catch (e: Exception) {
         val message = when (e) {
-            is io.ktor.client.plugins.ClientRequestException -> "Client error: ${e.response.status}"
-            is io.ktor.client.plugins.ServerResponseException -> "Server error: ${e.response.status}"
-            is io.ktor.client.plugins.HttpRequestTimeoutException -> "Request timeout"
-            else -> "Unknown error"
+            is io.ktor.client.plugins.ClientRequestException -> "Что-то не так с запросом: ${e.response.status}"
+            is io.ktor.client.plugins.ServerResponseException -> "Ошибка сервера: ${e.response.status}"
+            is io.ktor.client.plugins.HttpRequestTimeoutException -> "Запрос шел слишком долго"
+            else -> "Кажется, проблемы с интернетом или сервером"
         }
         NetworkResult.Error(message, e)
     }

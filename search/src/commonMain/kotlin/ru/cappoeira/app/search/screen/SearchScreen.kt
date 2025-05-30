@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import ru.cappoeira.app.designSystem.elements.chips.BigChip
 import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
@@ -51,13 +52,21 @@ fun SearchScreen(
                 SongType.CORRIDO -> state.corridoState.songs.isEmpty()
             }
 
-            state.error?.let {
-                TopBarGap()
-                GeneralText(it.errorMessage)
+            if (state.error != null) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    state.error?.let {
+                        GeneralText(it.errorMessage)
+                    }
+                }
             }
 
             this@Column.AnimatedVisibility(
-                visible = isEmptyResult && !state.isSkeletonShown,
+                visible = isEmptyResult && !state.isSkeletonShown && state.error == null,
                 enter = fadeIn(
                     animationSpec = tween(delayMillis = 150, durationMillis = 150),
                 ),
@@ -70,8 +79,9 @@ fun SearchScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    TopBarGap()
                     GeneralText("Не удалось найти ничего по запросу: ${viewModel.searchText.value}")
                 }
             }
