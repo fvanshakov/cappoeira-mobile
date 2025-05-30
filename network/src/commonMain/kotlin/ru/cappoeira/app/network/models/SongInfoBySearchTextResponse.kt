@@ -11,5 +11,7 @@ data class SongInfoBySearchTextResponse(
 @Serializable
 data class SongInfo(
     val id: String,
-    val songName: String
+    val songName: String,
+    val videoUrl: String?,
+    val songType: String
 )

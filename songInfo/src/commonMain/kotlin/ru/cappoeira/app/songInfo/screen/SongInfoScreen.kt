@@ -55,7 +55,7 @@ fun SongInfoScreen(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .background(color = Color.LightGray)
+            .background(color = Color.White)
     ) {
         item { TopBarGap() }
 

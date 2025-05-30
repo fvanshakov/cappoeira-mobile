@@ -20,9 +20,10 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SearchField(
+    searchText: String,
     onTextChanged: (newValue: String) -> Unit
 ) {
-    var search by remember { mutableStateOf("") }
+    var search by remember { mutableStateOf(searchText) }
 
     OutlinedTextField(
         value = search,

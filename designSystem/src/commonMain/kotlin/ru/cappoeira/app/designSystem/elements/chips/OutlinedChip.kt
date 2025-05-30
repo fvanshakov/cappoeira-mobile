@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun OutlinedChip(
+    color: Color = Color.Black,
     onClick: () -> Unit,
     isShimmering: Boolean = false,
     Content: @Composable (() -> Unit)
@@ -58,11 +59,12 @@ fun OutlinedChip(
     )
 
     var modifier = Modifier
+        .padding(horizontal = 16.dp)
         .fillMaxWidth()
         .wrapContentHeight()
         .padding(vertical = 8.dp)
         .drawBehind {
-            drawRoundRect(color = Color.Black, style = stroke)
+            drawRoundRect(color = color, style = stroke)
         }
 
     if (isShimmering) {
@@ -72,7 +74,7 @@ fun OutlinedChip(
     }
 
     Row(
-        horizontalArrangement = Arrangement.Absolute.Center,
+        horizontalArrangement = Arrangement.Absolute.SpaceAround,
         modifier = modifier
             .clickable { onClick() }
     ) {
