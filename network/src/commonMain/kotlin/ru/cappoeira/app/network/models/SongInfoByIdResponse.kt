@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class SongInfoByIdResponse(
     val id: String,
     val songName: String,
-    val videoUrl: String?
+    val videoUrl: String?,
+    val songLines: List<SongLine>
 )

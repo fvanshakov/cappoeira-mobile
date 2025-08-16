@@ -21,12 +21,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import ru.cappoeira.app.designSystem.elements.colors.DesignColors
 
 @Composable
 fun SwipeableTopbar(
     listState: LazyListState,
-    content: @Composable () -> Unit
+    isMainTheme: Boolean = true,
+    content: @Composable () -> Unit,
 ) {
     var isTopBarVisible by remember { mutableStateOf(true) }
 
@@ -56,7 +56,7 @@ fun SwipeableTopbar(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .background(
-                    color = Color.Black,
+                    color = if (isMainTheme) Color.Black else Color.White,
                     shape = RoundedCornerShape(
                         topStart = 0.dp,
                         topEnd = 0.dp,
