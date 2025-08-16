@@ -16,7 +16,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CloseIcon(onClick: () -> Unit) {
+fun CloseIcon(
+    isMainTheme: Boolean = true,
+    onClick: () -> Unit,
+) {
     Icon(
         imageVector = Icons.Filled.Close,
         contentDescription = "Close",
@@ -33,12 +36,15 @@ fun CloseIcon(onClick: () -> Unit) {
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ),
-        tint = Color.White,
+        tint = if (isMainTheme) Color.White else Color.Black,
     )
 }
 
 @Composable
-fun BackIcon(onClick: () -> Unit) {
+fun BackIcon(
+    isMainTheme: Boolean = true,
+    onClick: () -> Unit
+) {
     Icon(
         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
         contentDescription = "Back",
@@ -55,6 +61,6 @@ fun BackIcon(onClick: () -> Unit) {
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ),
-        tint = Color.White,
+        tint = if (isMainTheme) Color.White else Color.Black,
     )
 }

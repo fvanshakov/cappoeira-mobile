@@ -74,7 +74,7 @@ class SearchViewModel(
                 changeText(event.text)
             }
             is SearchEvent.Paginate -> {
-                if (_noMorePages == false) {
+                if (!_noMorePages) {
                     paginate()
                 }
             }
@@ -142,7 +142,7 @@ class SearchViewModel(
                 )
                 when(result) {
                     is NetworkResult.Success -> {
-                        processSuccess(result.data.songs.map { it.format() })
+                        processSuccess(result.data.songs.map { it.format(false) })
                     }
                     is NetworkResult.Error -> {
                         processError(result.message)
@@ -165,7 +165,7 @@ class SearchViewModel(
                 )
                 when(result) {
                     is NetworkResult.Success -> {
-                        processSuccess(result.data.songs.map { it.format() })
+                        processSuccess(result.data.songs.map { it.format(true) })
                     }
                     is NetworkResult.Error -> {
                         processError(result.message)

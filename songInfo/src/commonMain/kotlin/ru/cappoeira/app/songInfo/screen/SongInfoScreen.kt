@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +30,7 @@ import ru.cappoeira.app.designSystem.elements.icons.BackIcon
 import ru.cappoeira.app.designSystem.elements.texts.GeneralText
 import ru.cappoeira.app.designSystem.elements.topbar.SwipeableTopbar
 import ru.cappoeira.app.songInfo.state.SongInfoUIState
+import ru.cappoeira.app.songInfo.ui.SwipeableLyricsView
 import ru.cappoeira.app.songInfo.viewmodel.SongInfoViewModel
 import ru.cappoeira.app.videoPlayer.PlaybackView
 import ru.cappoeira.app.videoPlayer.PlaybackViewModel
@@ -50,65 +52,71 @@ fun SongInfoScreen(
 
     val listState = rememberLazyListState()
 
-    LazyColumn(
-        state = listState,
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .background(color = Color.White)
+            .background(color = Color.Black)
     ) {
-        item { TopBarGap() }
+        ScreenTopGap()
 
         when(state) {
             is SongInfoUIState.Loading -> {
-                item { GeneralText("Загрузка") }
+                GeneralText("Загрузка")
             }
             is SongInfoUIState.Success -> {
                 val vo = (state as SongInfoUIState.Success).vo
                 val url = vo.videoUrl
                 val usablePlayBackViewModel = playBackViewModel
                 if (url != null && usablePlayBackViewModel != null) {
-                    item {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(250.dp)
-                        ) {
-                            PlaybackView(
-                                isCustom = false,
-                                id = vo.id,
-                                url = url,
-                                viewModel = usablePlayBackViewModel
-                            )
-                        }
-                    }
-                } else {
-                    item {
-                        Column(
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(350.dp)
+                            .background(color = Color.Black),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Spacer(
                             Modifier
-                                .fillMaxSize()
-                                .height(250.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            GeneralText("Простите")
-                            GeneralText("Пока что данная песня не готова")
-                        }
+                                .height(75.dp)
+                        )
+                        PlaybackView(
+                            isCustom = false,
+                            id = vo.id,
+                            url = url,
+                            viewModel = usablePlayBackViewModel
+                        )
+                        Spacer(
+                            Modifier
+                                .height(25.dp)
+                        )
+                    }
+                    SwipeableLyricsView(vo.songLines)
+                } else {
+                    Column(
+                        Modifier
+                            .fillMaxSize()
+                            .height(250.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        GeneralText("Простите", color = Color.White)
+                        GeneralText("Пока что данная песня не готова", color = Color.White)
                     }
                 }
             }
             is SongInfoUIState.Error -> {
-                item {
-                    GeneralText(
-                        text = "Ошибка: ${(state as SongInfoUIState.Error).message}",
-                    )
-                }
+                GeneralText(
+                    text = "Ошибка: ${(state as SongInfoUIState.Error).message}",
+                    color = Color.White
+                )
             }
         }
     }
 
     SwipeableTopbar(
-        listState
+        listState,
+        isMainTheme = false
     ) {
         ScreenTopGap()
         Row(
@@ -123,17 +131,18 @@ fun SongInfoScreen(
                     .height(36.dp),
                 contentAlignment = Alignment.Center
             ) {
-                BackIcon(onBackPressed)
+                BackIcon(isMainTheme = false, onClick = onBackPressed)
             }
             GeneralText(
                 text = songName,
-                color = Color.White
+                color = Color.Black
             )
         }
     }
 
     DisposableEffect(Unit) {
         onDispose {
+            playBackViewModel?.playPause()
             playBackViewModel = null
         }
     }

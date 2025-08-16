@@ -89,7 +89,7 @@ fun SearchScreen(
             this@Column.AnimatedVisibility(
                 visible = state.isSkeletonShown,
                 enter = fadeIn(
-                    animationSpec = tween(durationMillis = 150),
+                    animationSpec = tween(delayMillis = 150, durationMillis = 150),
                 ),
                 exit = fadeOut(
                     animationSpec = tween(durationMillis = 150),
@@ -132,7 +132,7 @@ fun SearchScreen(
 
                     itemsIndexed(state.corridoState.songs, key = { _, song -> song.id }) { index, song ->
                         SongCard(song, onClickOnCard)
-                        if (index == state.corridoState.songs.lastIndex - 3) {
+                        if (index >= state.corridoState.songs.lastIndex - 5) {
                             viewModel.handleEvent(SearchEvent.Paginate)
                         }
                     }
@@ -143,11 +143,11 @@ fun SearchScreen(
                 visible = songType == SongType.LADAINHA && !state.isSkeletonShown,
                 enter = slideInHorizontally(
                     animationSpec = tween(delayMillis = 350, durationMillis = 300),
-                    initialOffsetX = { it } // slides in from right
+                    initialOffsetX = { it }
                 ),
                 exit = slideOutHorizontally(
                     animationSpec = tween(durationMillis = 300),
-                    targetOffsetX = { it } // slides out to right
+                    targetOffsetX = { it }
                 ),
                 modifier = Modifier
                     .fillMaxSize(),
@@ -160,7 +160,7 @@ fun SearchScreen(
                     item { TopBarGap() }
 
                     itemsIndexed(state.ladainhaState.songs, key = { _, song -> song.id }) { index, song -> SongCard(song, onClickOnCard)
-                        if (index == state.ladainhaState.songs.lastIndex - 3) {
+                        if (index >= state.ladainhaState.songs.lastIndex - 5) {
                             viewModel.handleEvent(SearchEvent.Paginate)
                         }
                     }
