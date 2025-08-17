@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import ru.cappoeira.app.analytics.Analytics
 import ru.cappoeira.app.network.NetworkResult
 import ru.cappoeira.app.network.SongInfoApi
+import ru.cappoeira.app.songInfo.events.SongInfoEvent
 import ru.cappoeira.app.songInfo.formatter.SongInfoByIdFormatter.format
 import ru.cappoeira.app.songInfo.state.SongInfoUIState
 
@@ -17,7 +18,9 @@ class SongInfoViewModel(
     private val id: String
 ): ViewModel() {
     private val _uiState = MutableStateFlow<SongInfoUIState>(SongInfoUIState.Loading)
+    private val _infoType = MutableStateFlow(InfoType.TEXT)
     val uiState: StateFlow<SongInfoUIState> = _uiState.asStateFlow()
+    val infoType = _infoType.asStateFlow()
 
     init {
         Analytics.sendEvent(
@@ -33,7 +36,6 @@ class SongInfoViewModel(
                         _uiState.value = SongInfoUIState.Success(
                             callResult.data.format()
                         )
-                        // https://storage.yandexcloud.net/videos-hls/Meta%20Melonha/master.m3u8
                     }
                     is NetworkResult.Error -> {
                         _uiState.value = SongInfoUIState.Error(
@@ -47,7 +49,25 @@ class SongInfoViewModel(
         }
     }
 
+    private fun switchSongInfoType(type: InfoType) {
+        _infoType.value = type
+    }
+
+    fun handleEvent(event: SongInfoEvent) {
+        when(event) {
+            is SongInfoEvent.ChangeSongInfoType -> {
+                switchSongInfoType(event.songType)
+            }
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
+    }
+
+    enum class InfoType(val stringValue: String) {
+        TEXT("текст"),
+        TAGS("тэги"),
+        OTHER_SONGS("что послушать дальше")
     }
 }

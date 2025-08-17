@@ -3,6 +3,7 @@ package ru.cappoeira.app.songInfo.formatter
 import ru.cappoeira.app.network.models.SongInfoByIdResponse
 import ru.cappoeira.app.songInfo.modles.SongInfoByIdViewObject
 import ru.cappoeira.app.songInfo.modles.SongInfoTextLineViewObject
+import ru.cappoeira.app.songInfo.modles.SongTagsViewObject
 
 object SongInfoByIdFormatter {
 
@@ -21,7 +22,10 @@ object SongInfoByIdFormatter {
                         index = it.index,
                         isChoirPart = it.isChoirPart
                     )
-                }
+                },
+                songTags = SongTagsViewObject(
+                    tagsWithValues = songTags.tagsWithValues
+                )
             )
         }
     }
