@@ -73,6 +73,9 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
 
+                // json
+                implementation(libs.kotlinx.serialization.json)
+
                 // koin
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose)

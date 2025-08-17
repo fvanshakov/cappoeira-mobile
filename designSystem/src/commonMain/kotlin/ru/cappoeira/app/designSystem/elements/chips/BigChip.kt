@@ -32,6 +32,7 @@ fun BigChip(
     text: String,
     onClick: (() -> Unit)? = null,
     color: Color = DesignColors.Orange,
+    additionalColor: Color = Color.Transparent,
     textColor: Color = Color.White,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
@@ -41,7 +42,7 @@ fun BigChip(
             .padding(paddingValues)
             .clip(RoundedCornerShape(8.dp))
             .background(
-                color = if (isSelected) color else Color.Transparent
+                color = if (isSelected) color else additionalColor
             )
             .indication(
                 interactionSource = remember { MutableInteractionSource() },

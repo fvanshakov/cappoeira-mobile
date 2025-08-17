@@ -1,5 +1,6 @@
 package ru.cappoeira.app.search.state
 
+import ru.cappoeira.app.network.models.SongTag
 import ru.cappoeira.app.search.SongType
 import ru.cappoeira.app.search.models.SongInfoViewObject
 
@@ -9,6 +10,7 @@ data class SearchUiState(
     val corridoState: SearchUiSongListState,
     val ladainhaState: SearchUiSongListState,
     val chosenType: SongType,
+    val chosenTags: List<SongTag>
 ) {
 
     data class SearchUiSongListState(
@@ -35,7 +37,8 @@ data class SearchUiState(
                 songType = SongType.LADAINHA,
                 songs = emptyList(),
                 isLoading = false
-            )
+            ),
+            chosenTags = emptyList()
         )
     }
 }

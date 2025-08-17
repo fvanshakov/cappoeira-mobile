@@ -5,18 +5,32 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import org.koin.compose.viewmodel.koinViewModel
+import ru.cappoeira.app.designSystem.elements.BottomSheet
 import ru.cappoeira.app.designSystem.elements.chips.BigChip
+import ru.cappoeira.app.designSystem.elements.chips.Chip
 import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
 import ru.cappoeira.app.designSystem.elements.gaps.ScreenTopGap
+import ru.cappoeira.app.designSystem.elements.gaps.SimpleGap
 import ru.cappoeira.app.designSystem.elements.gaps.TopBarGap
 import ru.cappoeira.app.designSystem.elements.searchField.SearchField
 import ru.cappoeira.app.designSystem.elements.texts.GeneralText
@@ -27,6 +41,7 @@ import ru.cappoeira.app.search.components.SongCard
 import ru.cappoeira.app.search.events.SearchEvent
 import ru.cappoeira.app.search.viewmodel.SearchViewModel
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = koinViewModel(),
@@ -34,6 +49,8 @@ fun SearchScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val songType by viewModel.songType.collectAsState()
+    val tags by viewModel.tags.collectAsState()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     val corridoListState = rememberLazyListState()
     val ladanihnaListState = rememberLazyListState()
@@ -167,6 +184,50 @@ fun SearchScreen(
                 }
             }
         }
+
+        if (showBottomSheet) {
+            BottomSheet(
+                onDismiss = { showBottomSheet = false }
+            ) {
+                LazyColumn(
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    tags.entries.forEach { (key, value) ->
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                GeneralText(text = key)
+                            }
+                        }
+                        item {
+                            FlowRow {
+                                value.values.forEach { tag ->
+                                    val event = SearchEvent.SelectTag(
+                                        key = key,
+                                        value = tag.value,
+                                        isPlural = value.isPlural
+                                    )
+                                    BigChip(
+                                        isSelected = tag.isChosen,
+                                        text = tag.value,
+                                        onClick = {
+                                            viewModel.handleEvent(
+                                                event
+                                            )
+                                        },
+                                        additionalColor = Color.LightGray,
+                                        paddingValues = PaddingValues(4.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     val swipeableListState = when(songType) {
@@ -201,6 +262,14 @@ fun SearchScreen(
                     }
                 }
             }
+        )
+        Chip(
+            isSelected = tags.entries.flatMap { it.value.values }.any { it.isChosen },
+            text = "тэги",
+            isClosable = true,
+            inactiveColor = Color.White,
+            onClose = { viewModel.handleEvent(SearchEvent.ClearTags) },
+            onClick = { showBottomSheet = true }
         )
     }
 }
