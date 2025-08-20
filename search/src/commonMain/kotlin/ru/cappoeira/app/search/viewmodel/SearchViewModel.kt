@@ -8,11 +8,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
 import ru.cappoeira.app.analytics.Analytics
 import ru.cappoeira.app.network.NetworkResult
 import ru.cappoeira.app.network.SongInfoApi
@@ -20,6 +24,8 @@ import ru.cappoeira.app.search.SongType
 import ru.cappoeira.app.search.events.SearchEvent
 import ru.cappoeira.app.search.formatter.SongInfoBySearchFormatter.format
 import ru.cappoeira.app.search.models.SongInfoViewObject
+import ru.cappoeira.app.search.models.SongTagValueViewObject
+import ru.cappoeira.app.search.models.SongTagViewObject
 import ru.cappoeira.app.search.state.SearchUiState
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -34,9 +40,11 @@ class SearchViewModel(
     private var _page: Int = 0
     private var _noMorePages: Boolean = false
     private var _job: Job? = null
+    private val _tags: MutableStateFlow<Map<String, SongTagViewObject>> = MutableStateFlow(mapOf())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
     val songType: StateFlow<SongType> = _songType.asStateFlow()
     val searchText: StateFlow<String> = _searchText.asStateFlow()
+    val tags: StateFlow<Map<String, SongTagViewObject>> = _tags.asStateFlow()
 
     init {
         Analytics.sendEvent(
@@ -45,10 +53,13 @@ class SearchViewModel(
                 "screen" to "Search"
             )
         )
-        _searchText
+        loadTags()
+        _searchText.combine(_tags) { query, tags ->
+            query to tags
+        }
             .debounce(400)
             .distinctUntilChanged()
-            .onEach { query ->
+            .onEach { (query, tags) ->
                 _searchText.value = query
                 loadSongs()
             }
@@ -77,6 +88,54 @@ class SearchViewModel(
                 if (!_noMorePages) {
                     paginate()
                 }
+            }
+            is SearchEvent.SelectTag -> {
+                clearPreviousJob()
+                _page = 0
+                _noMorePages = false
+                when (_songType.value) {
+                    SongType.CORRIDO -> { _uiState.value = SearchUiState.DEFAULT.copy(ladainhaState = _uiState.value.ladainhaState) }
+                    SongType.LADAINHA -> { _uiState.value = SearchUiState.DEFAULT.copy(corridoState = _uiState.value.corridoState) }
+                }
+
+                val tagsForKey = _tags.value[event.key] ?: return
+                val isChosen = tagsForKey.values.first { it.value == event.value }.isChosen
+                val refinedTags = if (!event.isPlural) {
+                    tagsForKey.copy(
+                        values = tagsForKey.values.map { it.copy(isChosen = false) }
+                    )
+                } else {
+                    tagsForKey
+                }
+                val modifiedTags = refinedTags.copy(
+                    values = refinedTags.values.map { tag ->
+                        if (tag.value == event.value) {
+                            tag.copy(isChosen = !isChosen)
+                        } else {
+                            tag
+                        }
+                    }
+                )
+                val newValue = _tags.value.toMutableMap()
+                newValue[event.key] = modifiedTags
+                _tags.value = newValue
+            }
+            is SearchEvent.ClearTags -> {
+                clearPreviousJob()
+                _page = 0
+                _noMorePages = false
+                when (_songType.value) {
+                    SongType.CORRIDO -> { _uiState.value = SearchUiState.DEFAULT.copy(ladainhaState = _uiState.value.ladainhaState) }
+                    SongType.LADAINHA -> { _uiState.value = SearchUiState.DEFAULT.copy(corridoState = _uiState.value.corridoState) }
+                }
+
+                val result = _tags.value.entries.associate { (key, value) ->
+                    key to SongTagViewObject(
+                        isPlural = value.isPlural,
+                        values = value.values.map { it.copy(isChosen = false) }
+                    )
+                }
+                _tags.value = result
             }
         }
     }
@@ -133,12 +192,48 @@ class SearchViewModel(
         _job = null
     }
 
+    private fun loadTags() {
+        viewModelScope.launch(context = Dispatchers.IO) {
+            when(val result = songInfoApi.getAllTags(_songType.value.serverValue)) {
+                is NetworkResult.Success -> {
+                    val tags = result.data.tags.map { (key, values) ->
+                        key to SongTagViewObject(
+                            values = values.values.map { tag ->
+                                SongTagValueViewObject(
+                                    isChosen = false,
+                                    value = tag
+                                )
+                            },
+                            isPlural = values.isPlural
+                        )
+                    }.toMap()
+                    _tags.value = tags
+                }
+                is NetworkResult.Error -> {
+
+                }
+            }
+        }
+    }
+
+    private fun getSelectedTags() = _tags.value.values
+        .flatMap { it.values }
+        .filter { it.isChosen }
+        .map { it.value }
+
+    @OptIn(ExperimentalEncodingApi::class)
     private fun loadAllSongs() {
         if (_job == null) {
             _job = viewModelScope.launch(context = Dispatchers.IO) {
+                val tags = getSelectedTags()
+                val jsonTags: String = Json.encodeToString(
+                    value = tags,
+                    serializer = ListSerializer(String.serializer())
+                )
                 val result = songInfoApi.getAllSongs(
                     songType = _songType.value.serverValue,
-                    page = _page
+                    page = _page,
+                    tags = Base64.encode(jsonTags.encodeToByteArray())
                 )
                 when(result) {
                     is NetworkResult.Success -> {
@@ -158,10 +253,16 @@ class SearchViewModel(
     private fun loadByText() {
         if (_job == null) {
             _job = viewModelScope.launch(context = Dispatchers.IO)  {
+                val tags = getSelectedTags()
+                val jsonTags: String = Json.encodeToString(
+                    value = tags,
+                    serializer = ListSerializer(String.serializer())
+                )
                 val result = songInfoApi.getSongsInfosByTextSearch(
                     textSearch = Base64.encode(_searchText.value.encodeToByteArray()),
                     songType = _songType.value.serverValue,
-                    page = _page
+                    page = _page,
+                    tags = Base64.encode(jsonTags.encodeToByteArray())
                 )
                 when(result) {
                     is NetworkResult.Success -> {

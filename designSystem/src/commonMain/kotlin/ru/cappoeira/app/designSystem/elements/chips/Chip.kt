@@ -31,16 +31,17 @@ fun Chip(
     isSelected: Boolean,
     text: String,
     isClosable: Boolean = false,
+    inactiveColor: Color = Color.LightGray,
     onClick: (() -> Unit)? = null,
     onClose: (() -> Unit)? = null
 ) {
 
     Row(
         modifier = Modifier
-            .padding(end = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(
-                color = if (isSelected) DesignColors.Orange else Color.LightGray
+                color = if (isSelected) DesignColors.Orange else inactiveColor
             )
             .indication(
                 interactionSource = remember { MutableInteractionSource() },
@@ -67,7 +68,7 @@ fun Chip(
             color = if (isSelected) Color.White else Color.Black,
             textAlign = TextAlign.Center,
         )
-        if (isClosable) {
+        if (isClosable && isSelected) {
             CloseIcon { onClose?.invoke() }
         }
     }

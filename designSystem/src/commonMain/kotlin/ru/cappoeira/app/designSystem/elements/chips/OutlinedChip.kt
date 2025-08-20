@@ -31,7 +31,8 @@ fun OutlinedChip(
     color: Color = Color.Black,
     onClick: () -> Unit,
     isShimmering: Boolean = false,
-    Content: @Composable (() -> Unit)
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Absolute.SpaceAround,
+    Content: @Composable (() -> Unit),
 ) {
     val transition = rememberInfiniteTransition()
     val shimmerTranslate by transition.animateFloat(
@@ -74,7 +75,7 @@ fun OutlinedChip(
     }
 
     Row(
-        horizontalArrangement = Arrangement.Absolute.SpaceAround,
+        horizontalArrangement = horizontalArrangement,
         modifier = modifier
             .clickable { onClick() }
     ) {

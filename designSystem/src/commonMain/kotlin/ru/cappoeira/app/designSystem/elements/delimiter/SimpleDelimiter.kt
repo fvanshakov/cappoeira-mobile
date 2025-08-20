@@ -1,6 +1,7 @@
 package ru.cappoeira.app.designSystem.elements.delimiter
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,15 +13,18 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SimpleDelimiter() {
+fun SimpleDelimiter(
+    color: Color = Color.Black,
+    padding: PaddingValues = PaddingValues(horizontal = 8.dp)
+) {
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp)
+            .padding(padding)
             .height(3.dp)
     ) {
         drawLine(
-            color = Color.Black,
+            color = color,
             start = Offset(0f, 0f),
             end = Offset(size.width, 0f),
             strokeWidth = 3.dp.toPx(),

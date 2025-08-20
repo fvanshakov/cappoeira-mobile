@@ -4,7 +4,8 @@ class SongInfoByIdViewObject(
     val id: String,
     val songName: String,
     val videoUrl: String?,
-    val songLines: List<SongInfoTextLineViewObject>
+    val songLines: List<SongInfoTextLineViewObject>,
+    val songTags: SongTagsViewObject
 )
 
 data class SongInfoTextLineViewObject(
@@ -14,4 +15,8 @@ data class SongInfoTextLineViewObject(
     val translation: String,
     val transcription: String,
     val isChoirPart: Boolean
+)
+
+data class SongTagsViewObject(
+    val tagsWithValues: Map<String, List<String>>
 )

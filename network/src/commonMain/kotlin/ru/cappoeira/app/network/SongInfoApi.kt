@@ -7,6 +7,7 @@ import io.ktor.client.request.parameter
 import ru.cappoeira.app.network.models.AllSongsResponse
 import ru.cappoeira.app.network.models.SongInfoByIdResponse
 import ru.cappoeira.app.network.models.SongInfoBySearchTextResponse
+import ru.cappoeira.app.network.models.SongTagsResponse
 
 interface SongInfoApi {
 
@@ -15,13 +16,19 @@ interface SongInfoApi {
     suspend fun getSongsInfosByTextSearch(
         textSearch: String,
         songType: String,
-        page: Int
+        page: Int,
+        tags: String
     ): NetworkResult<SongInfoBySearchTextResponse>
 
     suspend fun getAllSongs(
         page: Int,
-        songType: String
+        songType: String,
+        tags: String
     ): NetworkResult<AllSongsResponse>
+
+    suspend fun getAllTags(
+        filterType: String
+    ): NetworkResult<SongTagsResponse>
 }
 
 open class SongInfoApiImpl(
@@ -37,24 +44,36 @@ open class SongInfoApiImpl(
     override suspend fun getSongsInfosByTextSearch(
         textSearch: String,
         songType: String,
-        page: Int
+        page: Int,
+        tags: String
     ): NetworkResult<SongInfoBySearchTextResponse> {
         return safeApiCall {
             client.get("$URL/searchText/$textSearch") {
                 parameter("page", page.toString())
                 parameter("songType", songType)
+                parameter("tags", tags)
             }.body()
         }
     }
 
     override suspend fun getAllSongs(
         page: Int,
-        songType: String
+        songType: String,
+        tags: String
     ): NetworkResult<AllSongsResponse> {
         return safeApiCall {
             client.get("$URL/allSongs") {
                 parameter("page", page.toString())
                 parameter("songType", songType)
+                parameter("tags", tags)
+            }.body()
+        }
+    }
+
+    override suspend fun getAllTags(filterType: String): NetworkResult<SongTagsResponse> {
+        return safeApiCall {
+            client.get("$URL/tags") {
+                parameter("filterType", filterType)
             }.body()
         }
     }

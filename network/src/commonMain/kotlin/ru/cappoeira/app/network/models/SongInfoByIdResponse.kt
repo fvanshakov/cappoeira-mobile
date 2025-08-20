@@ -7,5 +7,11 @@ data class SongInfoByIdResponse(
     val id: String,
     val songName: String,
     val videoUrl: String?,
-    val songLines: List<SongLine>
+    val songLines: List<SongLine>,
+    val songTags: SongTags
+)
+
+@Serializable
+data class SongTags(
+    val tagsWithValues: Map<String, List<String>>
 )

@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,14 +31,18 @@ fun BigChip(
     isSelected: Boolean,
     text: String,
     onClick: (() -> Unit)? = null,
+    color: Color = DesignColors.Orange,
+    additionalColor: Color = Color.Transparent,
+    textColor: Color = Color.White,
+    paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
 
     Row(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(paddingValues)
             .clip(RoundedCornerShape(8.dp))
             .background(
-                color = if (isSelected) DesignColors.Orange else Color.Transparent
+                color = if (isSelected) color else additionalColor
             )
             .indication(
                 interactionSource = remember { MutableInteractionSource() },
@@ -61,7 +66,7 @@ fun BigChip(
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.SemiBold,
             fontSize = 18.sp,
-            color = Color.White,
+            color = textColor,
             textAlign = TextAlign.Center,
             maxLines = 1
         )
