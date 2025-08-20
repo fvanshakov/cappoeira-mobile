@@ -7,6 +7,8 @@ import ru.cappoeira.app.songInfo.modles.SongTagsViewObject
 
 object SongInfoByIdFormatter {
 
+    private const val THEME_KEY ="Темы текста"
+
     fun SongInfoByIdResponse.format(): SongInfoByIdViewObject {
         return with(this) {
             SongInfoByIdViewObject(
@@ -24,7 +26,10 @@ object SongInfoByIdFormatter {
                     )
                 },
                 songTags = SongTagsViewObject(
-                    tagsWithValues = songTags.tagsWithValues
+                    tagsWithValues = songTags.tagsWithValues.filter { it.key != THEME_KEY }
+                ),
+                themeTags = SongTagsViewObject(
+                    tagsWithValues = songTags.tagsWithValues.filter { it.key == THEME_KEY }
                 )
             )
         }

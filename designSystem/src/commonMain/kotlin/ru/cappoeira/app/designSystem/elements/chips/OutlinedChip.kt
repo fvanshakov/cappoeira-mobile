@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -29,9 +30,11 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun OutlinedChip(
     color: Color = Color.Black,
-    onClick: () -> Unit,
+    onClick: () -> Unit = {},
     isShimmering: Boolean = false,
+    alpha: Float = 1.0f,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Absolute.SpaceAround,
+    modifier: Modifier = Modifier,
     Content: @Composable (() -> Unit),
 ) {
     val transition = rememberInfiniteTransition()
@@ -55,28 +58,28 @@ fun OutlinedChip(
     )
 
     val stroke = Stroke(
-        width = 10f,
+        width = 6f,
         pathEffect = PathEffect.cornerPathEffect(50f)
     )
 
-    var modifier = Modifier
+    var applicableModifier = modifier
         .padding(horizontal = 16.dp)
         .fillMaxWidth()
         .wrapContentHeight()
         .padding(vertical = 8.dp)
         .drawBehind {
-            drawRoundRect(color = color, style = stroke)
+            drawRoundRect(color = color.copy(alpha = alpha), style = stroke)
         }
 
     if (isShimmering) {
-        modifier = modifier
+        applicableModifier = applicableModifier
             .clip(RoundedCornerShape(36))
             .background(shimmerBrush)
     }
 
     Row(
         horizontalArrangement = horizontalArrangement,
-        modifier = modifier
+        modifier = applicableModifier
             .clickable { onClick() }
     ) {
         Content()

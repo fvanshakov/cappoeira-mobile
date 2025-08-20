@@ -18,9 +18,9 @@ class SongInfoViewModel(
     private val id: String
 ): ViewModel() {
     private val _uiState = MutableStateFlow<SongInfoUIState>(SongInfoUIState.Loading)
-    private val _infoType = MutableStateFlow(InfoType.TEXT)
+    private val _lyricsType = MutableStateFlow(listOf(LyricsType.TEXT))
     val uiState: StateFlow<SongInfoUIState> = _uiState.asStateFlow()
-    val infoType = _infoType.asStateFlow()
+    val lyricsType = _lyricsType.asStateFlow()
 
     init {
         Analytics.sendEvent(
@@ -49,14 +49,21 @@ class SongInfoViewModel(
         }
     }
 
-    private fun switchSongInfoType(type: InfoType) {
-        _infoType.value = type
+    private fun switchSongLyricsType(type: LyricsType) {
+        if (_lyricsType.value.size == 1 && _lyricsType.value[0] == type) {
+            return
+        }
+        if (_lyricsType.value.contains(type)) {
+            _lyricsType.value -= type
+        } else {
+            _lyricsType.value += type
+        }
     }
 
     fun handleEvent(event: SongInfoEvent) {
         when(event) {
-            is SongInfoEvent.ChangeSongInfoType -> {
-                switchSongInfoType(event.songType)
+            is SongInfoEvent.ChangeSongLyricsType -> {
+                switchSongLyricsType(event.songType)
             }
         }
     }
@@ -65,9 +72,9 @@ class SongInfoViewModel(
         super.onCleared()
     }
 
-    enum class InfoType(val stringValue: String) {
+    enum class LyricsType(val stringValue: String) {
         TEXT("текст"),
-        TAGS("тэги"),
-        OTHER_SONGS("что послушать дальше")
+        TRANSLATION("перевод"),
+        TRANSCRIPTION("транскрипция")
     }
 }
