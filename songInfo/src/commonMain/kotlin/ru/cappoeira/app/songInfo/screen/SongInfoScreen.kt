@@ -1,9 +1,6 @@
 package ru.cappoeira.app.songInfo.screen
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +21,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,8 +31,10 @@ import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import ru.cappoeira.app.designSystem.elements.chips.BigChip
+import ru.cappoeira.app.designSystem.elements.chips.SmallChip
 import ru.cappoeira.app.designSystem.elements.delimiter.SimpleDelimiter
 import ru.cappoeira.app.designSystem.elements.gaps.ScreenTopGap
+import ru.cappoeira.app.designSystem.elements.gaps.SimpleGap
 import ru.cappoeira.app.designSystem.elements.icons.BackIcon
 import ru.cappoeira.app.designSystem.elements.texts.GeneralText
 import ru.cappoeira.app.designSystem.elements.topbar.SwipeableTopbar
@@ -59,9 +60,41 @@ fun SongInfoScreen(
             )
         }
     }
-    val infoType by viewModel.infoType.collectAsState()
+    val lyricsType by viewModel.lyricsType.collectAsState()
 
     val listState = rememberLazyListState()
+    val linesState = rememberLazyListState()
+
+    val songTagsHeight by remember {
+        derivedStateOf {
+            val rowsNbr = (((state as? SongInfoUIState.Success)
+                ?.vo?.songTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1
+            val maxHeight = 30.dp * rowsNbr
+            val scroll = linesState.firstVisibleItemScrollOffset
+            var calculatedHeight = maxHeight - (scroll.dp / 2)
+            if (linesState.firstVisibleItemIndex != 0) {
+                calculatedHeight = 0.dp
+            }
+
+            calculatedHeight.coerceIn(0.dp, maxHeight)
+        }
+    }
+
+    val themesTagsHeight by remember {
+        derivedStateOf {
+            val rowsNbr = (((state as? SongInfoUIState.Success)
+                ?.vo?.themeTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1
+            val maxHeight = 30.dp * rowsNbr
+            val scroll = linesState.firstVisibleItemScrollOffset
+            var calculatedHeight = maxHeight - (scroll.dp / 2)
+            if (linesState.firstVisibleItemIndex != 0) {
+                calculatedHeight = 0.dp
+            }
+
+
+            calculatedHeight.coerceIn(0.dp, maxHeight)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -80,17 +113,52 @@ fun SongInfoScreen(
                 val url = vo.videoUrl
                 val usablePlayBackViewModel = playBackViewModel
                 if (url != null && usablePlayBackViewModel != null) {
+                    Spacer(
+                        Modifier
+                            .height(75.dp)
+                    )
+
+                    FlowRow(
+                        modifier = Modifier
+                            .height(songTagsHeight)
+                            .animateContentSize()
+                    ) {
+                        vo.songTags.tagsWithValues
+                            .flatMap { it.value }
+                            .forEach {
+                                SmallChip(
+                                    isSelected = true,
+                                    text = it,
+                                    paddingValues = PaddingValues(4.dp)
+                                )
+                            }
+                    }
+                    SimpleGap()
+                    FlowRow(
+                        modifier = Modifier
+                            .height(themesTagsHeight)
+                            .animateContentSize()
+                    ) {
+                        vo.themeTags.tagsWithValues
+                            .flatMap { it.value }
+                            .forEach {
+                                SmallChip(
+                                    isSelected = true,
+                                    text = it,
+                                    textColor = Color.Black,
+                                    color = Color.White,
+                                    paddingValues = PaddingValues(4.dp)
+                                )
+                            }
+                    }
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(325.dp)
+                            .height(240.dp)
                             .background(color = Color.Black),
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Spacer(
-                            Modifier
-                                .height(75.dp)
-                        )
                         PlaybackView(
                             isCustom = false,
                             id = vo.id,
@@ -98,14 +166,21 @@ fun SongInfoScreen(
                             viewModel = usablePlayBackViewModel
                         )
                     }
-                    LazyRow {
-                        SongInfoViewModel.InfoType.entries.forEach { type ->
+
+                    LazyRow(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        SongInfoViewModel.LyricsType.entries.forEach { type ->
                             item {
                                 BigChip(
-                                    isSelected = type == infoType,
+                                    isSelected = type in lyricsType,
                                     text = type.stringValue,
+                                    additionalColor = Color.LightGray,
+                                    additionalTextColor = Color.Black,
+                                    paddingValues = PaddingValues(vertical = 16.dp,  horizontal = 4.dp),
                                     onClick = {
-                                        viewModel.handleEvent(SongInfoEvent.ChangeSongInfoType(type))
+                                        viewModel.handleEvent(SongInfoEvent.ChangeSongLyricsType(type))
                                     }
                                 )
                             }
@@ -116,49 +191,7 @@ fun SongInfoScreen(
                         padding = PaddingValues(all = 0.dp)
                     )
 
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        this@Column.AnimatedVisibility(
-                            visible = infoType == SongInfoViewModel.InfoType.TEXT,
-                            enter = slideInHorizontally(
-                                animationSpec = tween(delayMillis = 350, durationMillis = 300),
-                                initialOffsetX = { it }
-                            ),
-                            exit = slideOutHorizontally(
-                                animationSpec = tween(durationMillis = 300),
-                                targetOffsetX = { it }
-                            ),
-                            modifier = Modifier
-                                .fillMaxSize(),
-                        ) {
-                            SwipeableLyricsView(vo.songLines)
-                        }
-
-                        this@Column.AnimatedVisibility(
-                            visible = infoType == SongInfoViewModel.InfoType.TAGS,
-                            enter = slideInHorizontally(
-                                animationSpec = tween(delayMillis = 350, durationMillis = 300),
-                                initialOffsetX = { it }
-                            ),
-                            exit = slideOutHorizontally(
-                                animationSpec = tween(durationMillis = 300),
-                                targetOffsetX = { it }
-                            ),
-                            modifier = Modifier
-                                .fillMaxSize(),
-                        ) {
-                            FlowRow {
-                                vo.songTags.tagsWithValues.flatMap { it.value }.forEach {
-                                    BigChip(
-                                        isSelected = true,
-                                        text = it,
-                                        textColor = Color.Black,
-                                        color = Color.White,
-                                        paddingValues = PaddingValues(4.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    SwipeableLyricsView(vo.songLines, linesState, lyricsType)
                 } else {
                     Column(
                         Modifier
@@ -182,7 +215,7 @@ fun SongInfoScreen(
     }
 
     SwipeableTopbar(
-        listState,
+        listState = listState,
         isMainTheme = false
     ) {
         ScreenTopGap()

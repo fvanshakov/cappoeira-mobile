@@ -5,7 +5,8 @@ class SongInfoByIdViewObject(
     val songName: String,
     val videoUrl: String?,
     val songLines: List<SongInfoTextLineViewObject>,
-    val songTags: SongTagsViewObject
+    val songTags: SongTagsViewObject,
+    val themeTags: SongTagsViewObject
 )
 
 data class SongInfoTextLineViewObject(

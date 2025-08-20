@@ -26,16 +26,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.cappoeira.app.designSystem.elements.colors.DesignColors
 
+
 @Composable
-fun BigChip(
+fun SmallChip(
     isSelected: Boolean,
     text: String,
     onClick: (() -> Unit)? = null,
     color: Color = DesignColors.Orange,
     additionalColor: Color = Color.Transparent,
     textColor: Color = Color.White,
-    additionalTextColor: Color = Color.White,
-    paddingValues: PaddingValues = PaddingValues(16.dp)
+    paddingValues: PaddingValues = PaddingValues(12.dp)
 ) {
 
     Row(
@@ -57,7 +57,7 @@ fun BigChip(
                 )
             }
             .padding(horizontal = 16.dp)
-            .height(36.dp)
+            .height(20.dp)
             .wrapContentWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -66,8 +66,8 @@ fun BigChip(
             text = text.uppercase(),
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 18.sp,
-            color = if (isSelected) textColor else additionalTextColor,
+            fontSize = 10.sp,
+            color = textColor,
             textAlign = TextAlign.Center,
             maxLines = 1
         )
