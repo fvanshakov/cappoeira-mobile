@@ -14,7 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +24,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import org.koin.compose.viewmodel.koinViewModel
@@ -29,6 +33,7 @@ import ru.cappoeira.app.designSystem.elements.BottomSheet
 import ru.cappoeira.app.designSystem.elements.chips.BigChip
 import ru.cappoeira.app.designSystem.elements.chips.Chip
 import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
+import ru.cappoeira.app.designSystem.elements.colors.DesignColors
 import ru.cappoeira.app.designSystem.elements.gaps.ScreenTopGap
 import ru.cappoeira.app.designSystem.elements.gaps.SimpleGap
 import ru.cappoeira.app.designSystem.elements.gaps.TopBarGap
@@ -263,13 +268,30 @@ fun SearchScreen(
                 }
             }
         )
-        Chip(
-            isSelected = tags.entries.flatMap { it.value.values }.any { it.isChosen },
-            text = "тэги",
-            isClosable = true,
-            inactiveColor = Color.White,
-            onClose = { viewModel.handleEvent(SearchEvent.ClearTags) },
-            onClick = { showBottomSheet = true }
+        val support = "ПОДДЕРЖКА И БАГИ"
+        val anStringBuilder = AnnotatedString.Builder()
+        anStringBuilder.append(support)
+        anStringBuilder.addLink(
+            url = LinkAnnotation.Url("https://t.me/+lOrPtET6nhA0MTIx"),
+            0,
+            support.length - 1
         )
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Chip(
+                isSelected = tags.entries.flatMap { it.value.values }.any { it.isChosen },
+                text = "тэги",
+                isClosable = true,
+                inactiveColor = Color.White,
+                onClose = { viewModel.handleEvent(SearchEvent.ClearTags) },
+                onClick = { showBottomSheet = true }
+            )
+            GeneralText(
+                text = anStringBuilder.toAnnotatedString(),
+                color = DesignColors.Orange
+            )
+        }
     }
 }

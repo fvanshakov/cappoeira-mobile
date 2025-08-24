@@ -1,12 +1,16 @@
 package ru.cappoeira.app.songInfo.modles
 
+import ru.cappoeira.app.network.models.Transition
+
 class SongInfoByIdViewObject(
     val id: String,
     val songName: String,
     val videoUrl: String?,
     val songLines: List<SongInfoTextLineViewObject>,
     val songTags: SongTagsViewObject,
-    val themeTags: SongTagsViewObject
+    val themeTags: SongTagsViewObject,
+    val optimalTransitions: List<Transition>
+
 )
 
 data class SongInfoTextLineViewObject(

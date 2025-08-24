@@ -52,7 +52,7 @@ fun PlaybackView(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .background(Color.Black),
+            .background(Color.White),
         contentAlignment = Alignment.Center
     ) {
         PlatformMediaPlayerView(

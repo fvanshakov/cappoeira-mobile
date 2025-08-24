@@ -30,7 +30,8 @@ object SongInfoByIdFormatter {
                 ),
                 themeTags = SongTagsViewObject(
                     tagsWithValues = songTags.tagsWithValues.filter { it.key == THEME_KEY }
-                )
+                ),
+                optimalTransitions = optimalTransitions
             )
         }
     }
