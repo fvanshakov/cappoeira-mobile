@@ -15,12 +15,18 @@ class SongInfoNavScreen(
     private val songName: String
 ) : Screen {
 
+    override val key: String
+        get() = "song_info_${id}_${songName}"
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         SongInfoScreen(
             songName,
             { navigator.pop() },
+            { id, name ->
+                navigator.push(SongInfoNavScreen(id, name))
+            },
             koinViewModel(
                 key = "${SongInfoViewModel::class}$id",
                 parameters = { parametersOf(id) }

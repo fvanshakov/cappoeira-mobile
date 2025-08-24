@@ -2,6 +2,7 @@ package ru.cappoeira.app.songInfo.screen
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,28 +16,39 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import ru.cappoeira.app.designSystem.elements.BottomSheet
 import ru.cappoeira.app.designSystem.elements.chips.BigChip
+import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
 import ru.cappoeira.app.designSystem.elements.chips.SmallChip
+import ru.cappoeira.app.designSystem.elements.colors.DesignColors
 import ru.cappoeira.app.designSystem.elements.delimiter.SimpleDelimiter
 import ru.cappoeira.app.designSystem.elements.gaps.ScreenTopGap
 import ru.cappoeira.app.designSystem.elements.gaps.SimpleGap
 import ru.cappoeira.app.designSystem.elements.icons.BackIcon
 import ru.cappoeira.app.designSystem.elements.texts.GeneralText
+import ru.cappoeira.app.designSystem.elements.topbar.SwipeableBottomBar
 import ru.cappoeira.app.designSystem.elements.topbar.SwipeableTopbar
 import ru.cappoeira.app.songInfo.events.SongInfoEvent
 import ru.cappoeira.app.songInfo.state.SongInfoUIState
@@ -50,6 +62,7 @@ import ru.cappoeira.app.videoPlayer.PlaybackViewModel
 fun SongInfoScreen(
     songName: String,
     onBackPressed: () -> Unit,
+    onNextPressed: (songId: String, songName: String) -> Unit,
     viewModel: SongInfoViewModel
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -64,6 +77,8 @@ fun SongInfoScreen(
 
     val listState = rememberLazyListState()
     val linesState = rememberLazyListState()
+
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     val songTagsHeight by remember {
         derivedStateOf {
@@ -155,7 +170,7 @@ fun SongInfoScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(240.dp)
+                            .height(256.dp)
                             .background(color = Color.Black),
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -237,6 +252,60 @@ fun SongInfoScreen(
                 text = songName,
                 color = Color.Black
             )
+        }
+    }
+
+    if (state is SongInfoUIState.Success) {
+        val screenState = state as SongInfoUIState.Success
+
+        if (showBottomSheet) {
+            BottomSheet(
+                onDismiss = { showBottomSheet = false }
+            ) {
+                LazyColumn(
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    screenState.vo.optimalTransitions.map { transition ->
+                        item {
+                            OutlinedChip(
+                                onClick = { onNextPressed(transition.songId, transition.songName) }
+                            ) {
+                                GeneralText(transition.songName, color = Color.Black)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (screenState.vo.optimalTransitions.isNotEmpty()) {
+            SwipeableBottomBar(
+                listState = linesState,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 48.dp)
+                        .wrapContentHeight()
+                        .background(
+                            color = DesignColors.Orange,
+                            shape = RoundedCornerShape(
+                                bottomStart = 32.dp,
+                                bottomEnd = 32.dp,
+                                topStart = 32.dp,
+                                topEnd = 32.dp
+                            )
+                        )
+                        .shadow(
+                            elevation = 16.dp,
+                            shape = RoundedCornerShape(30.dp),
+                            clip = true
+                        )
+                        .clickable { showBottomSheet = true }
+                ) {
+                    GeneralText("CОЧЕТАЕТСЯ С", color = Color.White)
+                }
+            }
         }
     }
 

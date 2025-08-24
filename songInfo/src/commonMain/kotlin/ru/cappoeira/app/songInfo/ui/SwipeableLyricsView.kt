@@ -93,7 +93,7 @@ private fun LyricsText(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(8.dp)
             .alpha(alpha),
         verticalArrangement = Arrangement.Center
     ) {
