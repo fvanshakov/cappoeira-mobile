@@ -32,3 +32,11 @@ google-services.json
 
 # Android Profiling
 *.hprof
+/.kotlin/
+/iosApp/Pods/
+/gradlew.bat
+/analytics/analytics.podspec
+/iosApp/Podfile.lock
+/iosApp/iosApp.xcodeproj/xcuserdata/fedor.xcuserdatad/xcschemes/xcschememanagement.plist
+/iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata/fedor.xcuserdatad/UserInterfaceState.xcuserstate
+/iosApp/iosApp.xcworkspace/xcuserdata/fedor.xcuserdatad/UserInterfaceState.xcuserstate
