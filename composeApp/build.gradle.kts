@@ -30,6 +30,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(projects.analytics)
             implementation(libs.yandex.android.mobmetrica)
+
+            implementation(projects.androidApp)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

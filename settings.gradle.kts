@@ -31,3 +31,5 @@ dependencyResolutionManagement {
 include(":composeApp")
 include(":analytics")
 include(":designSystem")
+include(":linkOpener")
+include(":androidApp")
