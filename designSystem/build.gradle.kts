@@ -56,6 +56,7 @@ kotlin {
                 implementation(compose.components.uiToolingPreview)
 
                 implementation(projects.linkOpener)
+                implementation(projects.topbar)
             }
         }
 

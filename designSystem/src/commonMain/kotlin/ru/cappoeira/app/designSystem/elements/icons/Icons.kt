@@ -4,25 +4,21 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import ru.cappoeira.app.topbar.BackArrowIcon
+import ru.cappoeira.app.topbar.CloseCrossIcon
 
 @Composable
 fun CloseIcon(
     isMainTheme: Boolean = true,
     onClick: () -> Unit,
 ) {
-    Icon(
-        imageVector = Icons.Filled.Close,
-        contentDescription = "Close",
+    CloseCrossIcon(
         modifier = Modifier
             .size(24.dp)
             .pointerInput(Unit) {
@@ -36,7 +32,7 @@ fun CloseIcon(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ),
-        tint = if (isMainTheme) Color.White else Color.Black,
+        color = if (isMainTheme) Color.White else Color.Black,
     )
 }
 
@@ -45,9 +41,8 @@ fun BackIcon(
     isMainTheme: Boolean = true,
     onClick: () -> Unit
 ) {
-    Icon(
-        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-        contentDescription = "Back",
+
+    BackArrowIcon(
         modifier = Modifier
             .size(24.dp)
             .pointerInput(Unit) {
@@ -61,6 +56,6 @@ fun BackIcon(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ),
-        tint = if (isMainTheme) Color.White else Color.Black,
+        color = if (isMainTheme) Color.White else Color.Black,
     )
 }

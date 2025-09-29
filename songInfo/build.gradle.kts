@@ -66,6 +66,7 @@ kotlin {
                 implementation(projects.videoPlayer)
                 implementation(projects.network)
                 implementation(projects.designSystem)
+                implementation(projects.analytics)
             }
         }
 

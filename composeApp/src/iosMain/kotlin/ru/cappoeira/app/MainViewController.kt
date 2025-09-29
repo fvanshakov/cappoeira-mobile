@@ -1,4 +1,4 @@
-package ru.cappoeira
+package ru.cappoeira.app
 
 import androidx.compose.ui.window.ComposeUIViewController
 import ru.cappoeira.analytics.Analytics

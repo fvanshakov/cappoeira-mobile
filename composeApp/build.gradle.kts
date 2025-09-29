@@ -15,6 +15,7 @@ kotlin {
     }
     
     listOf(
+        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -25,6 +26,7 @@ kotlin {
     }
     
     sourceSets {
+        
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -34,30 +36,45 @@ kotlin {
             implementation(projects.androidApp)
         }
         commonMain.dependencies {
+            // compose
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material3)
+            implementation(compose.material)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
+
+            // viewmodel and lifecycle
+            implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-        }
-        iosMain.dependencies {
+
+            // koin
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+
+            // navigation
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.transitions)
+            implementation(libs.voyager.screenmodel)
+            implementation(libs.voyager.koin)
+            implementation(libs.voyager.livedata)
+
+            // other project modules
+            implementation(projects.search)
+            implementation(projects.songInfo)
+            implementation(projects.topbar)
             implementation(projects.analytics)
         }
     }
 }
 
 android {
-    namespace = "ru.cappoeira"
+    namespace = "ru.cappoeira.app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "ru.cappoeira"
+        applicationId = "ru.cappoeira.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

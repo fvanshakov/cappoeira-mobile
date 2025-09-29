@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.cappoeira.app.analytics.Analytics
+import ru.cappoeira.analytics.Analytics
 import ru.cappoeira.app.network.NetworkResult
 import ru.cappoeira.app.network.SongInfoApi
 import ru.cappoeira.app.songInfo.events.SongInfoEvent
@@ -23,8 +23,8 @@ class SongInfoViewModel(
     val lyricsType = _lyricsType.asStateFlow()
 
     init {
-        Analytics.sendEvent(
-            eventName = "openScreen",
+        Analytics.logEvent(
+            name = "openScreen",
             params = mapOf(
                 "screen" to "SongInfo"
             )
