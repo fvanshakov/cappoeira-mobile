@@ -3,7 +3,6 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
-    alias(libs.plugins.androidLint)
     alias(libs.plugins.kotlinCocoapods)
 }
 
@@ -133,7 +132,6 @@ kotlin {
             dependencies {
                 implementation(libs.androidx.runner)
                 implementation(libs.androidx.core)
-                implementation(libs.androidx.testExt.junit)
             }
         }
 
