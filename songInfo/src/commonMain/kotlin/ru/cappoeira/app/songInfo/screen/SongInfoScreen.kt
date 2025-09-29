@@ -1,0 +1,319 @@
+package ru.cappoeira.app.songInfo.screen
+
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
+import ru.cappoeira.app.designSystem.elements.BottomSheet
+import ru.cappoeira.app.designSystem.elements.BugButton
+import ru.cappoeira.app.designSystem.elements.chips.BigChip
+import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
+import ru.cappoeira.app.designSystem.elements.chips.SmallChip
+import ru.cappoeira.app.designSystem.elements.colors.DesignColors
+import ru.cappoeira.app.designSystem.elements.delimiter.SimpleDelimiter
+import ru.cappoeira.app.designSystem.elements.gaps.ScreenTopGap
+import ru.cappoeira.app.designSystem.elements.icons.BackIcon
+import ru.cappoeira.app.designSystem.elements.texts.GeneralText
+import ru.cappoeira.app.designSystem.elements.topbar.SwipeableBottomBar
+import ru.cappoeira.app.designSystem.elements.topbar.SwipeableTopbar
+import ru.cappoeira.app.songInfo.events.SongInfoEvent
+import ru.cappoeira.app.songInfo.state.SongInfoUIState
+import ru.cappoeira.app.songInfo.ui.SwipeableLyricsView
+import ru.cappoeira.app.songInfo.viewmodel.SongInfoViewModel
+import ru.cappoeira.app.videoPlayer.PlaybackView
+import ru.cappoeira.app.videoPlayer.PlaybackViewModel
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun SongInfoScreen(
+    songName: String,
+    onBackPressed: () -> Unit,
+    onNextPressed: (songId: String, songName: String) -> Unit,
+    viewModel: SongInfoViewModel
+) {
+    val state by viewModel.uiState.collectAsState()
+    var playBackViewModel: PlaybackViewModel? = (state as? SongInfoUIState.Success)?.vo?.let { vo ->
+        vo.videoUrl?.let { url ->
+            koinViewModel(
+                parameters = { parametersOf(url, vo.id) }
+            )
+        }
+    }
+    val lyricsType by viewModel.lyricsType.collectAsState()
+
+    val linesState = rememberLazyListState()
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    val songTagsHeight by remember {
+        derivedStateOf {
+            val rowsNbr = (((state as? SongInfoUIState.Success)
+                ?.vo?.songTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1
+            val maxHeight = 30.dp * rowsNbr
+            val scroll = linesState.firstVisibleItemScrollOffset
+            var calculatedHeight = maxHeight - (scroll.dp / 2)
+            if (linesState.firstVisibleItemIndex != 0) {
+                calculatedHeight = 0.dp
+            }
+
+            calculatedHeight.coerceIn(0.dp, maxHeight)
+        }
+    }
+
+    val themesTagsHeight by remember {
+        derivedStateOf {
+            val rowsNbr = (((state as? SongInfoUIState.Success)
+                ?.vo?.themeTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1
+            val maxHeight = 30.dp * rowsNbr
+            val scroll = linesState.firstVisibleItemScrollOffset
+            var calculatedHeight = maxHeight - (scroll.dp / 2)
+            if (linesState.firstVisibleItemIndex != 0) {
+                calculatedHeight = 0.dp
+            }
+
+
+            calculatedHeight.coerceIn(0.dp, maxHeight)
+        }
+    }
+
+    Box(Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .background(color = Color.Black)
+        ) {
+            ScreenTopGap()
+
+            when(state) {
+                is SongInfoUIState.Loading -> {
+                    GeneralText("Загрузка")
+                }
+                is SongInfoUIState.Success -> {
+                    val vo = (state as SongInfoUIState.Success).vo
+                    val url = vo.videoUrl
+                    val usablePlayBackViewModel = playBackViewModel
+
+                    Spacer(
+                        Modifier
+                            .height(75.dp)
+                    )
+
+                    FlowRow(
+                        modifier = Modifier
+                            .height(songTagsHeight)
+                            .animateContentSize()
+                    ) {
+                        vo.songTags.tagsWithValues
+                            .flatMap { it.value }
+                            .forEach {
+                                SmallChip(
+                                    isSelected = true,
+                                    text = it,
+                                    paddingValues = PaddingValues(4.dp)
+                                )
+                            }
+                    }
+                    FlowRow(
+                        modifier = Modifier
+                            .height(themesTagsHeight)
+                            .animateContentSize()
+                    ) {
+                        vo.themeTags.tagsWithValues
+                            .flatMap { it.value }
+                            .forEach {
+                                SmallChip(
+                                    isSelected = true,
+                                    text = it,
+                                    textColor = Color.Black,
+                                    color = Color.White,
+                                    paddingValues = PaddingValues(4.dp)
+                                )
+                            }
+                    }
+                    if (url != null && usablePlayBackViewModel != null) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(256.dp)
+                                .background(color = Color.Black),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            PlaybackView(
+                                isCustom = false,
+                                id = vo.id,
+                                url = url,
+                                viewModel = usablePlayBackViewModel
+                            )
+                        }
+                    } else {
+                        Column(
+                            Modifier
+                                .wrapContentHeight()
+                                .fillMaxWidth()
+                                .height(250.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            GeneralText("Простите", color = Color.White)
+                            GeneralText("Пока что данная песня не готова", color = Color.White)
+                        }
+                    }
+                    LazyRow(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        SongInfoViewModel.LyricsType.entries.forEach { type ->
+                            item {
+                                BigChip(
+                                    isSelected = type in lyricsType,
+                                    text = type.stringValue,
+                                    additionalColor = Color.LightGray,
+                                    additionalTextColor = Color.Black,
+                                    paddingValues = PaddingValues(vertical = 16.dp,  horizontal = 4.dp),
+                                    onClick = {
+                                        viewModel.handleEvent(SongInfoEvent.ChangeSongLyricsType(type))
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    SimpleDelimiter(
+                        color = Color.White,
+                        padding = PaddingValues(all = 0.dp)
+                    )
+
+                    SwipeableLyricsView(vo.songLines, linesState, lyricsType)
+                }
+                is SongInfoUIState.Error -> {
+                    GeneralText(
+                        text = "Ошибка: ${(state as SongInfoUIState.Error).message}",
+                        color = Color.White
+                    )
+                }
+            }
+
+        }
+        BugButton(modifier = Modifier.align(Alignment.BottomEnd))
+    }
+
+    SwipeableTopbar(
+        listState = linesState,
+        isMainTheme = false
+    ) {
+        ScreenTopGap()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp)
+                .wrapContentWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .height(36.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                BackIcon(isMainTheme = false, onClick = onBackPressed)
+            }
+            GeneralText(
+                text = songName,
+                color = Color.Black
+            )
+        }
+    }
+
+    if (state is SongInfoUIState.Success) {
+        val screenState = state as SongInfoUIState.Success
+
+        if (showBottomSheet) {
+            BottomSheet(
+                onDismiss = { showBottomSheet = false }
+            ) {
+                LazyColumn(
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    screenState.vo.optimalTransitions.map { transition ->
+                        item {
+                            OutlinedChip(
+                                onClick = { onNextPressed(transition.songId, transition.songName) }
+                            ) {
+                                GeneralText(transition.songName, color = Color.Black)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (screenState.vo.optimalTransitions.isNotEmpty()) {
+            SwipeableBottomBar(
+                listState = linesState,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 48.dp)
+                        .wrapContentHeight()
+                        .background(
+                            color = DesignColors.Orange,
+                            shape = RoundedCornerShape(
+                                bottomStart = 32.dp,
+                                bottomEnd = 32.dp,
+                                topStart = 32.dp,
+                                topEnd = 32.dp
+                            )
+                        )
+                        .shadow(
+                            elevation = 16.dp,
+                            shape = RoundedCornerShape(30.dp),
+                            clip = true
+                        )
+                        .clickable { showBottomSheet = true }
+                ) {
+                    GeneralText("CОЧЕТАЕТСЯ С", color = Color.White)
+                }
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            playBackViewModel?.playPause()
+            playBackViewModel = null
+        }
+    }
+}
