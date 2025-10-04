@@ -167,8 +167,8 @@ fun SongInfoScreen(
                     if (url != null && usablePlayBackViewModel != null) {
                         Column(
                             modifier = Modifier
+                                .wrapContentHeight()
                                 .fillMaxWidth()
-                                .height(256.dp)
                                 .background(color = Color.Black),
                             verticalArrangement = Arrangement.Center
                         ) {

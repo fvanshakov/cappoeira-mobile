@@ -9,7 +9,11 @@ actual class LinkOpener actual constructor() {
 
         val application = UIApplication.sharedApplication
         if (application.canOpenURL(nsUrl)) {
-            application.openURL(nsUrl)
+            application.openURL(
+                nsUrl,
+                options = emptyMap<Any?, Any>(),
+                completionHandler = null
+            )
         } else {
             println("Cannot open URL: $url")
         }

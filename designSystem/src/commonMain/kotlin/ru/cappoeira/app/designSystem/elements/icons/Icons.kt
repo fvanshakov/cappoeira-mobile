@@ -57,5 +57,6 @@ fun BackIcon(
                 indication = null
             ),
         color = if (isMainTheme) Color.White else Color.Black,
+        strokeWidth = 8f
     )
 }

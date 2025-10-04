@@ -23,12 +23,13 @@ actual fun PlatformMediaPlayerView(
 ) {
     val avPlayerViewController = remember { AVPlayerViewController() }
     avPlayerViewController.player = remember { playbackStateController.avPlayer }
-    avPlayerViewController.showsPlaybackControls = hidePlayback
+    avPlayerViewController.showsPlaybackControls = true
     avPlayerViewController.view.setFrame(CGRectMake(0.0, 0.0, 0.10, 0.10))
 
     UIKitView(
         factory = {
             val playerContainer = UIView()
+            avPlayerViewController.view.userInteractionEnabled = true
             playerContainer.addSubview(avPlayerViewController.view)
             playerContainer
         },
