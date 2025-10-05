@@ -22,7 +22,13 @@ data class SongLine(
     val id: String,
     val index: Int,
     val text: String,
-    val translation: String,
+    val translation: List<SongTextChunk>,
     val transcription: String,
     val isChoirPart: Boolean
+)
+
+@Serializable
+data class SongTextChunk(
+    val text: String,
+    val definition: String?
 )

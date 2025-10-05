@@ -4,6 +4,7 @@ import ru.cappoeira.app.network.models.SongInfoByIdResponse
 import ru.cappoeira.app.songInfo.modles.SongInfoByIdViewObject
 import ru.cappoeira.app.songInfo.modles.SongInfoTextLineViewObject
 import ru.cappoeira.app.songInfo.modles.SongTagsViewObject
+import ru.cappoeira.app.songInfo.modles.SongTextChunkViewObject
 
 object SongInfoByIdFormatter {
 
@@ -20,7 +21,12 @@ object SongInfoByIdFormatter {
                         id = it.id,
                         text = it.text,
                         transcription = it.transcription,
-                        translation = it.translation,
+                        translation = it.translation.map { chunk ->
+                            SongTextChunkViewObject(
+                                text = chunk.text,
+                                definition = chunk.definition
+                            )
+                        },
                         index = it.index,
                         isChoirPart = it.isChoirPart
                     )

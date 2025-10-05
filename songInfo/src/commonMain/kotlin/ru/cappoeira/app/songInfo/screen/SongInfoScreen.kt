@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -37,10 +37,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import ru.cappoeira.app.designSystem.elements.BottomSheet
 import ru.cappoeira.app.designSystem.elements.BugButton
 import ru.cappoeira.app.designSystem.elements.chips.BigChip
 import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
@@ -77,7 +81,8 @@ fun SongInfoScreen(
 
     val lyricsType by viewModel.lyricsType.collectAsState()
     val chosenFunctionality by viewModel.chosenFunctionality.collectAsState()
-
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var definitionToShow = remember { mutableStateOf("") }
     val linesState = rememberLazyListState()
 
     val songTagsHeight by remember {
@@ -275,7 +280,15 @@ fun SongInfoScreen(
                                 padding = PaddingValues(all = 0.dp)
                             )
 
-                            SwipeableLyricsView(vo.songLines, linesState, lyricsType)
+                            SwipeableLyricsView(
+                                vo.songLines,
+                                linesState,
+                                lyricsType,
+                                { definition ->
+                                    definitionToShow.value = definition
+                                    showBottomSheet = true
+                                }
+                            )
                         }
                     }
                     this@Column.AnimatedVisibility(
@@ -315,6 +328,28 @@ fun SongInfoScreen(
 
         }
         BugButton(modifier = Modifier.align(Alignment.BottomEnd))
+    }
+
+    if (showBottomSheet) {
+        BottomSheet(
+            onDismiss = { showBottomSheet = false }
+        ) {
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
+                item {
+                    Text(
+                        text = definitionToShow.value,
+                        modifier = Modifier.wrapContentWidth()
+                            .padding(end = 8.dp),
+                        fontFamily = FontFamily.SansSerif,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = Color.Black,
+                    )
+                }
+            }
+        }
     }
 
     SwipeableTopbar(

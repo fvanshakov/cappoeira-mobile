@@ -10,7 +10,12 @@ data class SongInfoTextLineViewObject(
     val id: String,
     val index: Int,
     val text: String,
-    val translation: String,
+    val translation: List<SongTextChunkViewObject>,
     val transcription: String,
     val isChoirPart: Boolean
+)
+
+data class SongTextChunkViewObject(
+    val text: String,
+    val definition: String?
 )
