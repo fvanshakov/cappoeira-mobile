@@ -19,8 +19,12 @@ class SongInfoViewModel(
 ): ViewModel() {
     private val _uiState = MutableStateFlow<SongInfoUIState>(SongInfoUIState.Loading)
     private val _lyricsType = MutableStateFlow(listOf(LyricsType.TEXT))
+
+    private val _chosenFunctionality = MutableStateFlow(FunctionalityType.TEXT)
     val uiState: StateFlow<SongInfoUIState> = _uiState.asStateFlow()
     val lyricsType = _lyricsType.asStateFlow()
+
+    val chosenFunctionality = _chosenFunctionality.asStateFlow()
 
     init {
         Analytics.logEvent(
@@ -60,21 +64,34 @@ class SongInfoViewModel(
         }
     }
 
+    private fun switchChosenFunctionality(functionalityType: FunctionalityType) {
+        _chosenFunctionality.value = functionalityType
+    }
+
     fun handleEvent(event: SongInfoEvent) {
         when(event) {
             is SongInfoEvent.ChangeSongLyricsType -> {
                 switchSongLyricsType(event.songType)
+            }
+            is SongInfoEvent.ChangeChosenFunctionality -> {
+                switchChosenFunctionality(event.functionalityType)
             }
         }
     }
 
     override fun onCleared() {
         super.onCleared()
+
     }
 
     enum class LyricsType(val stringValue: String) {
-        TEXT("текст"),
+        TEXT("оригинал"),
         TRANSLATION("перевод"),
         TRANSCRIPTION("транскрипция")
+    }
+
+    enum class FunctionalityType(val stringValue: String) {
+        TEXT("текст"),
+        TRANSITION("сочетается с")
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.cappoeira.app.designSystem.elements.colors.DesignColors
@@ -35,7 +36,8 @@ fun BigChip(
     additionalColor: Color = Color.Transparent,
     textColor: Color = Color.White,
     additionalTextColor: Color = Color.White,
-    paddingValues: PaddingValues = PaddingValues(16.dp)
+    paddingValues: PaddingValues = PaddingValues(16.dp),
+    fontSize: TextUnit = 18.sp
 ) {
 
     Row(
@@ -66,7 +68,7 @@ fun BigChip(
             text = text.uppercase(),
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 18.sp,
+            fontSize = fontSize,
             color = if (isSelected) textColor else additionalTextColor,
             textAlign = TextAlign.Center,
             maxLines = 1

@@ -48,7 +48,9 @@ class PlaybackViewModel(
                 callback = { currentPosition, duration ->
                     _progressState.value = if (duration > 0) currentPosition.toFloat() / duration else 0f
                 },
-                playbackState = { _playBackState.value = it }
+                playbackState = {
+                    _playBackState.value = it
+                }
             )
             playbackStateController.addItems(playbackMediaItems)
         } catch (e: Exception) {
@@ -63,6 +65,15 @@ class PlaybackViewModel(
         }
     }
 
+    fun pause() {
+        viewModelScope.launch {
+            playbackStateController.pause(
+                playbackState = {
+                    _playBackState.value = it
+                }
+            )
+        }
+    }
 
     fun playPause() {
         viewModelScope.launch {

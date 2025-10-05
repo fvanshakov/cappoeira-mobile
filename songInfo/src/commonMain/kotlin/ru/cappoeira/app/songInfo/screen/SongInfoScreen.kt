@@ -1,8 +1,11 @@
 package ru.cappoeira.app.songInfo.screen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,25 +32,23 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import ru.cappoeira.app.designSystem.elements.BottomSheet
 import ru.cappoeira.app.designSystem.elements.BugButton
 import ru.cappoeira.app.designSystem.elements.chips.BigChip
 import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
 import ru.cappoeira.app.designSystem.elements.chips.SmallChip
-import ru.cappoeira.app.designSystem.elements.colors.DesignColors
 import ru.cappoeira.app.designSystem.elements.delimiter.SimpleDelimiter
 import ru.cappoeira.app.designSystem.elements.gaps.ScreenTopGap
 import ru.cappoeira.app.designSystem.elements.icons.BackIcon
 import ru.cappoeira.app.designSystem.elements.texts.GeneralText
-import ru.cappoeira.app.designSystem.elements.topbar.SwipeableBottomBar
 import ru.cappoeira.app.designSystem.elements.topbar.SwipeableTopbar
 import ru.cappoeira.app.songInfo.events.SongInfoEvent
 import ru.cappoeira.app.songInfo.state.SongInfoUIState
@@ -72,11 +73,12 @@ fun SongInfoScreen(
             )
         }
     }
+    val latestViewModel by rememberUpdatedState(playBackViewModel)
+
     val lyricsType by viewModel.lyricsType.collectAsState()
+    val chosenFunctionality by viewModel.chosenFunctionality.collectAsState()
 
     val linesState = rememberLazyListState()
-
-    var showBottomSheet by remember { mutableStateOf(false) }
 
     val songTagsHeight by remember {
         derivedStateOf {
@@ -98,6 +100,20 @@ fun SongInfoScreen(
             val rowsNbr = (((state as? SongInfoUIState.Success)
                 ?.vo?.themeTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1
             val maxHeight = 30.dp * rowsNbr
+            val scroll = linesState.firstVisibleItemScrollOffset
+            var calculatedHeight = maxHeight - (scroll.dp / 2)
+            if (linesState.firstVisibleItemIndex != 0) {
+                calculatedHeight = 0.dp
+            }
+
+
+            calculatedHeight.coerceIn(0.dp, maxHeight)
+        }
+    }
+
+    val functionalityPickerSize by remember {
+        derivedStateOf {
+            val maxHeight = 90.dp
             val scroll = linesState.firstVisibleItemScrollOffset
             var calculatedHeight = maxHeight - (scroll.dp / 2)
             if (linesState.firstVisibleItemIndex != 0) {
@@ -160,7 +176,7 @@ fun SongInfoScreen(
                                     text = it,
                                     textColor = Color.Black,
                                     color = Color.White,
-                                    paddingValues = PaddingValues(4.dp)
+                                    paddingValues = PaddingValues(4.dp),
                                 )
                             }
                     }
@@ -192,31 +208,102 @@ fun SongInfoScreen(
                             GeneralText("Пока что данная песня не готова", color = Color.White)
                         }
                     }
-                    LazyRow(
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        modifier = Modifier.fillMaxWidth()
+
+                    OutlinedChip(
+                        color = Color.White,
+                        isShimmering = false,
+                        modifier = Modifier
+                            .height(functionalityPickerSize)
+                            .animateContentSize(),
+                        onClick = {  },
+                        Content = {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .fillMaxWidth()
+                            ) {
+                                SongInfoViewModel.FunctionalityType.entries.forEach {
+                                    BigChip(
+                                        isSelected = chosenFunctionality == it,
+                                        text = it.stringValue,
+                                        onClick = {
+                                            viewModel.handleEvent(SongInfoEvent.ChangeChosenFunctionality(it))
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    )
+
+                    this@Column.AnimatedVisibility(
+                        visible = chosenFunctionality == SongInfoViewModel.FunctionalityType.TEXT,
+                        enter = fadeIn(
+                            animationSpec = tween(delayMillis = 150, durationMillis = 150),
+                        ),
+                        exit = fadeOut(
+                            animationSpec = tween(durationMillis = 150),
+                        ),
+                        modifier = Modifier
+                            .fillMaxSize()
                     ) {
-                        SongInfoViewModel.LyricsType.entries.forEach { type ->
-                            item {
-                                BigChip(
-                                    isSelected = type in lyricsType,
-                                    text = type.stringValue,
-                                    additionalColor = Color.LightGray,
-                                    additionalTextColor = Color.Black,
-                                    paddingValues = PaddingValues(vertical = 16.dp,  horizontal = 4.dp),
-                                    onClick = {
-                                        viewModel.handleEvent(SongInfoEvent.ChangeSongLyricsType(type))
+
+                        Column {
+                            LazyRow(
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                SongInfoViewModel.LyricsType.entries.forEach { type ->
+                                    item {
+                                        BigChip(
+                                            isSelected = type in lyricsType,
+                                            text = type.stringValue,
+                                            additionalColor = Color.LightGray,
+                                            additionalTextColor = Color.Black,
+                                            paddingValues = PaddingValues(vertical = 16.dp,  horizontal = 4.dp),
+                                            onClick = {
+                                                viewModel.handleEvent(SongInfoEvent.ChangeSongLyricsType(type))
+                                            },
+                                            fontSize = 14.sp
+                                        )
                                     }
-                                )
+                                }
+                            }
+                            SimpleDelimiter(
+                                color = Color.White,
+                                padding = PaddingValues(all = 0.dp)
+                            )
+
+                            SwipeableLyricsView(vo.songLines, linesState, lyricsType)
+                        }
+                    }
+                    this@Column.AnimatedVisibility(
+                        visible = chosenFunctionality == SongInfoViewModel.FunctionalityType.TRANSITION,
+                        enter = fadeIn(
+                            animationSpec = tween(delayMillis = 150, durationMillis = 150),
+                        ),
+                        exit = fadeOut(
+                            animationSpec = tween(durationMillis = 150),
+                        ),
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        ) {
+                            vo.optimalTransitions.map { transition ->
+                                item {
+                                    OutlinedChip(
+                                        color = Color.White,
+                                        onClick = { onNextPressed(transition.songId, transition.songName) }
+                                    ) {
+                                        GeneralText(transition.songName, color = Color.White)
+                                    }
+                                }
                             }
                         }
                     }
-                    SimpleDelimiter(
-                        color = Color.White,
-                        padding = PaddingValues(all = 0.dp)
-                    )
-
-                    SwipeableLyricsView(vo.songLines, linesState, lyricsType)
                 }
                 is SongInfoUIState.Error -> {
                     GeneralText(
@@ -256,64 +343,9 @@ fun SongInfoScreen(
         }
     }
 
-    if (state is SongInfoUIState.Success) {
-        val screenState = state as SongInfoUIState.Success
-
-        if (showBottomSheet) {
-            BottomSheet(
-                onDismiss = { showBottomSheet = false }
-            ) {
-                LazyColumn(
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                ) {
-                    screenState.vo.optimalTransitions.map { transition ->
-                        item {
-                            OutlinedChip(
-                                onClick = { onNextPressed(transition.songId, transition.songName) }
-                            ) {
-                                GeneralText(transition.songName, color = Color.Black)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (screenState.vo.optimalTransitions.isNotEmpty()) {
-            SwipeableBottomBar(
-                listState = linesState,
-            ) {
-                Column(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .padding(start = 16.dp, end = 16.dp, bottom = 48.dp)
-                        .wrapContentHeight()
-                        .background(
-                            color = DesignColors.Orange,
-                            shape = RoundedCornerShape(
-                                bottomStart = 32.dp,
-                                bottomEnd = 32.dp,
-                                topStart = 32.dp,
-                                topEnd = 32.dp
-                            )
-                        )
-                        .shadow(
-                            elevation = 16.dp,
-                            shape = RoundedCornerShape(30.dp),
-                            clip = true
-                        )
-                        .clickable { showBottomSheet = true }
-                ) {
-                    GeneralText("CОЧЕТАЕТСЯ С", color = Color.White)
-                }
-            }
-        }
-    }
-
     DisposableEffect(Unit) {
         onDispose {
-            playBackViewModel?.playPause()
-            playBackViewModel = null
+            latestViewModel?.pause()
         }
     }
 }

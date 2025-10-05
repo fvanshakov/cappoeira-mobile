@@ -11,29 +11,33 @@ import ru.cappoeira.app.videoPlayer.Media3PlayerComponent
 actual class PlaybackStateController(private val media3PlayerComponent: Media3PlayerComponent) {
 
 
+    private var _isInitialized: Boolean = false
     actual fun addItem(mediaItem: PlaybackMediaItem) {
         media3PlayerComponent.addMediaItem(mediaItem)
     }
 
     actual fun initPlayer(callback: (Long, Long) -> Unit, playbackState: (PlaybackState) -> Unit) {
-        media3PlayerComponent.initPlayer()
-        media3PlayerComponent.setControllerListener(PlaybackControllerListener(playbackState))
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = object : Runnable {
-            override fun run() {
-                if (media3PlayerComponent.getMediaController() != null &&
-                    media3PlayerComponent.getMediaController()?.isPlaying == true) {
-                    callback(currentPosition(), duration())
-                    playbackState(PlaybackState.Playing)
+        if (!_isInitialized) {
+            media3PlayerComponent.initPlayer()
+            media3PlayerComponent.setControllerListener(PlaybackControllerListener(playbackState))
+            val handler = Handler(Looper.getMainLooper())
+            val runnable = object : Runnable {
+                override fun run() {
+                    if (media3PlayerComponent.getMediaController() != null &&
+                        media3PlayerComponent.getMediaController()?.isPlaying == true) {
+                        callback(currentPosition(), duration())
+                        playbackState(PlaybackState.Playing)
+                    }
+                    val state = media3PlayerComponent.getMediaController()?.playbackState
+                    if (state == Player.STATE_BUFFERING) {
+                        playbackState(PlaybackState.Buffering)
+                    }
+                    handler.postDelayed(this, 1000)
                 }
-                val state = media3PlayerComponent.getMediaController()?.playbackState
-                if (state == Player.STATE_BUFFERING) {
-                    playbackState(PlaybackState.Buffering)
-                }
-                handler.postDelayed(this, 1000)
             }
+            handler.post(runnable)
+            _isInitialized = true
         }
-        handler.post(runnable)
     }
 
     actual fun pause(playbackState: (PlaybackState) -> Unit) {
