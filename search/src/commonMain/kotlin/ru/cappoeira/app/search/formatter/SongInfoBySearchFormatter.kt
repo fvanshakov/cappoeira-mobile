@@ -17,7 +17,12 @@ object SongInfoBySearchFormatter {
                         SongInfoTextLineViewObject(
                             id = it.id,
                             text = it.text,
-                            transcription = it.transcription,
+                            transcription = it.transcription.map { translationChunk ->
+                                SongTextChunkViewObject(
+                                    text = translationChunk.text,
+                                    definition = translationChunk.definition
+                                )
+                            },
                             translation = it.translation.map { translationChunk ->
                                 SongTextChunkViewObject(
                                     text = translationChunk.text,

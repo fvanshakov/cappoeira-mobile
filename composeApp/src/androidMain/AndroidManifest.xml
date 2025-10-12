@@ -23,9 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <meta-data
-            android:name="com.yandex.metrica.API_KEY"
-            android:value="186e8d86-21c9-4b08-93ee-645df9b652c2" />
     </application>
 
 </manifest>

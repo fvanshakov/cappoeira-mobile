@@ -13,6 +13,7 @@ import platform.AVFoundation.isPlaybackLikelyToKeepUp
 import platform.AVFoundation.pause
 import platform.AVFoundation.play
 import platform.AVFoundation.rate
+import platform.AVFoundation.replaceCurrentItemWithPlayerItem
 import platform.AVFoundation.seekToTime
 import platform.CoreMedia.CMTimeGetSeconds
 import platform.CoreMedia.CMTimeMake
@@ -40,11 +41,11 @@ actual class PlaybackStateController {
         }
     }
 
-    actual fun addItem(mediaItem: PlaybackMediaItem) {
+    actual fun setItem(mediaItem: PlaybackMediaItem) {
         val nsUrl = NSURL.URLWithString(mediaItem.url)
         val playerItem = nsUrl?.let { AVPlayerItem(it) }
         if (playerItem != null) {
-            avPlayer.insertItem(playerItem, null)
+            avPlayer.replaceCurrentItemWithPlayerItem(playerItem)
         }
     }
 
@@ -87,7 +88,7 @@ actual class PlaybackStateController {
 
     actual fun addItems(items: List<PlaybackMediaItem>) {
         items.forEach { item ->
-            addItem(item)
+            setItem(item)
         }
     }
 

@@ -3,6 +3,7 @@ package ru.cappoeira.app.designSystem.elements.icons
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -20,7 +21,8 @@ fun CloseIcon(
 ) {
     CloseCrossIcon(
         modifier = Modifier
-            .size(24.dp)
+            .padding(start = 8.dp)
+            .size(16.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
@@ -33,6 +35,7 @@ fun CloseIcon(
                 indication = null
             ),
         color = if (isMainTheme) Color.White else Color.Black,
+        strokeWidth = 8f
     )
 }
 

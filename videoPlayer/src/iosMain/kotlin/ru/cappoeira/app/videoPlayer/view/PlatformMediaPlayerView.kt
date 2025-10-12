@@ -2,9 +2,11 @@ package ru.cappoeira.app.videoPlayer.view
 
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVFoundation.pause
@@ -37,6 +39,6 @@ actual fun PlatformMediaPlayerView(
             avPlayerViewController.player?.play()
         },
         onRelease = { avPlayerViewController.player?.pause() },
-        modifier = Modifier.fillMaxWidth().fillMaxHeight(0.4f)
+        modifier = Modifier.fillMaxWidth().height(260.dp)
     )
 }

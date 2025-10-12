@@ -11,5 +11,10 @@ sealed class SearchEvent {
         val value: String,
         val isPlural: Boolean
     ) : SearchEvent()
+
+    data class InheritTag(
+        val key: String?,
+        val value: String?,
+    ) : SearchEvent()
     data object ClearTags : SearchEvent()
 }

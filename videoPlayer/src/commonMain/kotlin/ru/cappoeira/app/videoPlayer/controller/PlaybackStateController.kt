@@ -16,7 +16,7 @@ sealed class PlaybackState {
 
 expect class PlaybackStateController {
     fun initPlayer(callback: (Long, Long) -> Unit, playbackState: (PlaybackState) -> Unit)
-    fun addItem(mediaItem: PlaybackMediaItem)
+    fun setItem(mediaItem: PlaybackMediaItem)
     fun pause(playbackState: (PlaybackState) -> Unit)
     fun play(playbackState: (PlaybackState) -> Unit)
     fun resume()

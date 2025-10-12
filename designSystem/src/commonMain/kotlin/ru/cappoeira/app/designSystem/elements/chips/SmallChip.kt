@@ -59,7 +59,7 @@ fun SmallChip(
                 )
             }
             .padding(horizontal = 16.dp)
-            .height(20.dp)
+            .height(24.dp)
             .wrapContentWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,

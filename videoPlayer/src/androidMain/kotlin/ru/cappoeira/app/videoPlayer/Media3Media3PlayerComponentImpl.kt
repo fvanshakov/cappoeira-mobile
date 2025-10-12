@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -61,6 +62,7 @@ class Media3PlayerComponentImpl(
     override fun setMediaItem(mediaItem: PlaybackMediaItem) {
         val mediaItemWithMetadata = MediaItem.Builder()
             .setUri(mediaItem.url)
+            .setMimeType(MimeTypes.APPLICATION_M3U8)
             .setMediaId(mediaItem.id)
             .setMediaMetadata(
                 MediaMetadata.Builder()
@@ -71,12 +73,14 @@ class Media3PlayerComponentImpl(
         val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
         val hlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
             .createMediaSource(mediaItemWithMetadata)
+        player.removeMediaItem(0)
         player.setMediaSource(hlsMediaSource)
     }
 
     override fun addMediaItem(mediaItem: PlaybackMediaItem) {
         val mediaItemWithMetadata = MediaItem.Builder()
             .setUri(mediaItem.url)
+            .setMimeType(MimeTypes.APPLICATION_M3U8)
             .setMediaId(mediaItem.url)
             .setMediaMetadata(
                 MediaMetadata.Builder()

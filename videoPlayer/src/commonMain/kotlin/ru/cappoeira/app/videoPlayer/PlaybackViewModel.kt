@@ -17,6 +17,7 @@ class PlaybackViewModel(
 ) : ViewModel() {
     private val _playBackState = MutableStateFlow<PlaybackState>(PlaybackState.Buffering)
     private val _progressState = MutableStateFlow(0F)
+    val playbackState = _playBackState.asStateFlow()
 
     val playBackStateUI = _playBackState.asStateFlow()
     val progressStateUI = _progressState.asStateFlow()
@@ -32,17 +33,15 @@ class PlaybackViewModel(
     private fun initialise() {
         viewModelScope.launch {
             handleStartPlayback(
-                listOf(
-                    PlaybackMediaItem(
-                        id = id,
-                        url = url
-                    )
+                PlaybackMediaItem(
+                    id = id,
+                    url = url
                 )
             )
         }
     }
 
-    private fun handleStartPlayback(playbackMediaItems: List<PlaybackMediaItem>) {
+    private fun handleStartPlayback(playbackMediaItem: PlaybackMediaItem) {
         try {
             playbackStateController.initPlayer(
                 callback = { currentPosition, duration ->
@@ -52,7 +51,8 @@ class PlaybackViewModel(
                     _playBackState.value = it
                 }
             )
-            playbackStateController.addItems(playbackMediaItems)
+            playPause()
+            playbackStateController.setItem(playbackMediaItem)
         } catch (e: Exception) {
             _playBackState.value = PlaybackState.Error("Exception was thrown.")
         }

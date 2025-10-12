@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -39,11 +40,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import org.koin.mp.KoinPlatform.getKoin
 import ru.cappoeira.app.designSystem.elements.BottomSheet
 import ru.cappoeira.app.designSystem.elements.BugButton
 import ru.cappoeira.app.designSystem.elements.chips.BigChip
@@ -65,16 +65,17 @@ import ru.cappoeira.app.videoPlayer.PlaybackViewModel
 @Composable
 fun SongInfoScreen(
     songName: String,
+    onTagPressed: (Triple<String, String, Boolean>) -> Unit,
     onBackPressed: () -> Unit,
     onNextPressed: (songId: String, songName: String) -> Unit,
     viewModel: SongInfoViewModel
 ) {
     val state by viewModel.uiState.collectAsState()
-    var playBackViewModel: PlaybackViewModel? = (state as? SongInfoUIState.Success)?.vo?.let { vo ->
-        vo.videoUrl?.let { url ->
-            koinViewModel(
-                parameters = { parametersOf(url, vo.id) }
-            )
+    val playBackViewModel = remember((state as? SongInfoUIState.Success)?.vo?.id) {
+        (state as? SongInfoUIState.Success)?.vo?.let { vo ->
+            vo.videoUrl?.let { url ->
+                getKoin().get<PlaybackViewModel>(parameters = { parametersOf(url, vo.id) })
+            }
         }
     }
     val latestViewModel by rememberUpdatedState(playBackViewModel)
@@ -89,7 +90,7 @@ fun SongInfoScreen(
         derivedStateOf {
             val rowsNbr = (((state as? SongInfoUIState.Success)
                 ?.vo?.songTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1
-            val maxHeight = 30.dp * rowsNbr
+            val maxHeight = 34.dp * rowsNbr
             val scroll = linesState.firstVisibleItemScrollOffset
             var calculatedHeight = maxHeight - (scroll.dp / 2)
             if (linesState.firstVisibleItemIndex != 0) {
@@ -104,7 +105,7 @@ fun SongInfoScreen(
         derivedStateOf {
             val rowsNbr = (((state as? SongInfoUIState.Success)
                 ?.vo?.themeTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1
-            val maxHeight = 30.dp * rowsNbr
+            val maxHeight = 34.dp * rowsNbr
             val scroll = linesState.firstVisibleItemScrollOffset
             var calculatedHeight = maxHeight - (scroll.dp / 2)
             if (linesState.firstVisibleItemIndex != 0) {
@@ -130,7 +131,11 @@ fun SongInfoScreen(
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        Modifier
+            .systemBarsPadding()
+            .fillMaxSize()
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -159,12 +164,17 @@ fun SongInfoScreen(
                             .animateContentSize()
                     ) {
                         vo.songTags.tagsWithValues
-                            .flatMap { it.value }
+                            .flatMap { tagsWithKeys ->
+                                tagsWithKeys.value.map { tagsWithKeys.key to it  }
+                            }
                             .forEach {
                                 SmallChip(
                                     isSelected = true,
-                                    text = it,
-                                    paddingValues = PaddingValues(4.dp)
+                                    text = it.second,
+                                    paddingValues = PaddingValues(4.dp),
+                                    onClick = {
+                                        onTagPressed(Triple(it.first, it.second, false))
+                                    }
                                 )
                             }
                     }
@@ -174,14 +184,19 @@ fun SongInfoScreen(
                             .animateContentSize()
                     ) {
                         vo.themeTags.tagsWithValues
-                            .flatMap { it.value }
+                            .flatMap { tagsWithKeys ->
+                                tagsWithKeys.value.map { tagsWithKeys.key to it  }
+                            }
                             .forEach {
                                 SmallChip(
                                     isSelected = true,
-                                    text = it,
+                                    text = it.second,
                                     textColor = Color.Black,
                                     color = Color.White,
                                     paddingValues = PaddingValues(4.dp),
+                                    onClick = {
+                                        onTagPressed(Triple(it.first, it.second, false))
+                                    }
                                 )
                             }
                     }
@@ -378,7 +393,7 @@ fun SongInfoScreen(
         }
     }
 
-    DisposableEffect(Unit) {
+    DisposableEffect(songName) {
         onDispose {
             latestViewModel?.pause()
         }

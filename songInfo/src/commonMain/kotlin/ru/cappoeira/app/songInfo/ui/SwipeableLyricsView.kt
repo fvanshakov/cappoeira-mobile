@@ -174,15 +174,39 @@ private fun LyricsText(
                 exit = fadeOut() + shrinkVertically(),
             ) {
                 SimpleGap()
-                Text(
+                FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    text = line.transcription,
-                    fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = Color.White
-                )
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    line.transcription.forEach { chunk ->
+                        if (chunk.definition == null) {
+                            Text(
+                                modifier = Modifier.wrapContentWidth(),
+                                textAlign = TextAlign.Center,
+                                text = chunk.text,
+                                fontFamily = FontFamily.SansSerif,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                color = Color.White
+                            )
+                        } else {
+                            Text(
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .background(DesignColors.Orange, CircleShape)
+                                    .clickable {
+                                        onDefinitionClicked(chunk.definition)
+                                    },
+                                textAlign = TextAlign.Center,
+                                text = chunk.text,
+                                fontFamily = FontFamily.SansSerif,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                color = Color.White,
+                            )
+                        }
+                    }
+                }
             }
         }
     }

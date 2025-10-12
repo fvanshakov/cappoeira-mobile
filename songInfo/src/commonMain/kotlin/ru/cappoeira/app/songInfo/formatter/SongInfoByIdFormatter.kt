@@ -20,7 +20,12 @@ object SongInfoByIdFormatter {
                     SongInfoTextLineViewObject(
                         id = it.id,
                         text = it.text,
-                        transcription = it.transcription,
+                        transcription = it.transcription.map { chunk ->
+                            SongTextChunkViewObject(
+                                text = chunk.text,
+                                definition = chunk.definition
+                            )
+                        },
                         translation = it.translation.map { chunk ->
                             SongTextChunkViewObject(
                                 text = chunk.text,

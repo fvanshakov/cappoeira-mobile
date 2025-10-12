@@ -23,7 +23,7 @@ data class SongLine(
     val index: Int,
     val text: String,
     val translation: List<SongTextChunk>,
-    val transcription: String,
+    val transcription: List<SongTextChunk>,
     val isChoirPart: Boolean
 )
 

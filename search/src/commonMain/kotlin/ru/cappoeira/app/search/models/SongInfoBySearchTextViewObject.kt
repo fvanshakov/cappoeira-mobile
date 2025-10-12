@@ -11,7 +11,7 @@ data class SongInfoTextLineViewObject(
     val index: Int,
     val text: String,
     val translation: List<SongTextChunkViewObject>,
-    val transcription: String,
+    val transcription: List<SongTextChunkViewObject>,
     val isChoirPart: Boolean
 )
 

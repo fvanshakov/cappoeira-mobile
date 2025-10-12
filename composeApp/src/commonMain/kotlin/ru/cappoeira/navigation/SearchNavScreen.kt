@@ -7,12 +7,14 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ru.cappoeira.analytics.Analytics
 import ru.cappoeira.app.search.screen.SearchScreen
 
-object SearchNavScreen : Screen {
+class SearchNavScreen(
+    private val initialTag: Triple<String, String, Boolean>?
+) : Screen {
 
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        SearchScreen { id, songName ->
+        SearchScreen(initialTag = initialTag) { id, songName ->
             Analytics.logEvent(
                 name = "clickOnCard",
                 params = mapOf(

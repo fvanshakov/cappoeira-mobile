@@ -89,6 +89,36 @@ class SearchViewModel(
                     paginate()
                 }
             }
+            is SearchEvent.InheritTag -> {
+                clearPreviousJob()
+                _page = 0
+                _noMorePages = false
+
+                when (_songType.value) {
+                    SongType.CORRIDO -> { _uiState.value = SearchUiState.DEFAULT.copy(ladainhaState = _uiState.value.ladainhaState) }
+                    SongType.LADAINHA -> { _uiState.value = SearchUiState.DEFAULT.copy(corridoState = _uiState.value.corridoState) }
+                }
+
+                val newValue = _tags.value.entries.associate { (key, value) ->
+                    val newTagVo = if (key == event.key) {
+                        value.copy(
+                            values = value.values.map {
+                                if (it.value == event.value) {
+                                    it.copy(isChosen = true)
+                                } else {
+                                    it.copy(isChosen = false)
+                                }
+                            }
+                        )
+                    } else {
+                        value.copy(
+                            values = value.values.map { it.copy(isChosen = false) }
+                        )
+                    }
+                    key to newTagVo
+                }
+                _tags.value = newValue
+            }
             is SearchEvent.SelectTag -> {
                 clearPreviousJob()
                 _page = 0

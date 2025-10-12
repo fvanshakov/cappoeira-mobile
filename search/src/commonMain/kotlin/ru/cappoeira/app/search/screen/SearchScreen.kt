@@ -35,6 +35,7 @@ import ru.cappoeira.app.search.viewmodel.SearchViewModel
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = koinViewModel(),
+    initialTag: Triple<String, String, Boolean>?,
     onClickOnCard: (id: String, songName: String) -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -46,9 +47,21 @@ fun SearchScreen(
     val ladanihnaListState = rememberLazyListState()
     val skeletonListState = rememberLazyListState()
 
+    LaunchedEffect(initialTag) {
+        initialTag?.let {
+            viewModel.handleEvent(
+                SearchEvent.InheritTag(
+                    initialTag.first,
+                    initialTag.second,
+                )
+            )
+        }
+    }
+
     Column(
         Modifier
             .fillMaxSize()
+            .systemBarsPadding()
             .background(color = Color.White)
     ) {
 

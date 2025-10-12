@@ -12,8 +12,8 @@ actual class PlaybackStateController(private val media3PlayerComponent: Media3Pl
 
 
     private var _isInitialized: Boolean = false
-    actual fun addItem(mediaItem: PlaybackMediaItem) {
-        media3PlayerComponent.addMediaItem(mediaItem)
+    actual fun setItem(mediaItem: PlaybackMediaItem) {
+        media3PlayerComponent.setMediaItem(mediaItem)
     }
 
     actual fun initPlayer(callback: (Long, Long) -> Unit, playbackState: (PlaybackState) -> Unit) {
@@ -36,8 +36,8 @@ actual class PlaybackStateController(private val media3PlayerComponent: Media3Pl
                 }
             }
             handler.post(runnable)
-            _isInitialized = true
         }
+        _isInitialized = true
     }
 
     actual fun pause(playbackState: (PlaybackState) -> Unit) {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,6 +42,7 @@ fun PlaybackView(
     viewModel: PlaybackViewModel
 ) {
     val controller = remember { viewModel.getPlatformController() }
+    val playbackState = viewModel.playbackState.collectAsState()
 
     Box(
         Modifier
@@ -51,8 +53,8 @@ fun PlaybackView(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
-            .background(Color.White),
+            .height(270.dp)
+            .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
         PlatformMediaPlayerView(
