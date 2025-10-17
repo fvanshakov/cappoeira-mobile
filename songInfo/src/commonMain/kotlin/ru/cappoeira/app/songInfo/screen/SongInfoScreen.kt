@@ -117,6 +117,19 @@ fun SongInfoScreen(
         }
     }
 
+    val topSpacerHeight by remember {
+        derivedStateOf {
+            val maxHeight = 75.dp
+            val scroll = linesState.firstVisibleItemScrollOffset
+            var calculatedHeight = maxHeight - (scroll.dp / 2)
+            if (linesState.firstVisibleItemIndex != 0) {
+                calculatedHeight = 0.dp
+            }
+
+            calculatedHeight.coerceIn(0.dp, maxHeight)
+        }
+    }
+
     val functionalityPickerSize by remember {
         derivedStateOf {
             val maxHeight = 90.dp
@@ -142,8 +155,6 @@ fun SongInfoScreen(
                 .fillMaxHeight()
                 .background(color = Color.Black)
         ) {
-            ScreenTopGap()
-
             when(state) {
                 is SongInfoUIState.Loading -> {
                     GeneralText("Загрузка")
@@ -155,7 +166,8 @@ fun SongInfoScreen(
 
                     Spacer(
                         Modifier
-                            .height(75.dp)
+                            .height(topSpacerHeight)
+                            .animateContentSize()
                     )
 
                     FlowRow(
@@ -371,7 +383,6 @@ fun SongInfoScreen(
         listState = linesState,
         isMainTheme = false
     ) {
-        ScreenTopGap()
         Row(
             modifier = Modifier
                 .fillMaxWidth()

@@ -8,6 +8,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,6 +55,7 @@ fun SwipeableTopbar(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .systemBarsPadding()
                 .wrapContentHeight()
                 .background(
                     color = if (isMainTheme) Color.Black else Color.White,

@@ -20,7 +20,6 @@ import ru.cappoeira.app.designSystem.elements.BugButton
 import ru.cappoeira.app.designSystem.elements.chips.BigChip
 import ru.cappoeira.app.designSystem.elements.chips.Chip
 import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
-import ru.cappoeira.app.designSystem.elements.gaps.ScreenTopGap
 import ru.cappoeira.app.designSystem.elements.gaps.TopBarGap
 import ru.cappoeira.app.designSystem.elements.searchField.SearchField
 import ru.cappoeira.app.designSystem.elements.texts.GeneralText
@@ -61,11 +60,15 @@ fun SearchScreen(
     Column(
         Modifier
             .fillMaxSize()
-            .systemBarsPadding()
-            .background(color = Color.White)
+            .background(color = Color.Black)
     ) {
 
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+                .background(color = Color.White)
+        ) {
 
             val isEmptyResult = when(songType) {
                 SongType.LADAINHA -> state.ladainhaState.songs.isEmpty()
@@ -245,7 +248,6 @@ fun SearchScreen(
     SwipeableTopbar(
         swipeableListState
     ) {
-        ScreenTopGap()
         SearchField(viewModel.searchText.value) { text -> viewModel.handleEvent(SearchEvent.ChangeSearchText(text)) }
         OutlinedChip(
             color = Color.White,
