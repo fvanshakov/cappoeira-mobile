@@ -1,7 +1,6 @@
 package ru.cappoeira.app.songInfo.ui
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -26,9 +25,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -55,32 +52,17 @@ fun SwipeableLyricsView(
     ) {
         LazyColumn(
             state = scrollState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            userScrollEnabled = false
         ) {
             itemsIndexed(lyrics) { index, line ->
-                val alpha by animateFloatAsState(
-                    targetValue = calculateAlpha(
-                        currentIndex = scrollState.firstVisibleItemIndex + 1,
-                        itemIndex = index
-                    ),
-                    label = "text_alpha"
-                )
 
                 Box(
                     modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
                 ) {
-                    if (line.isChoirPart) {
-                        OutlinedChip(
-                            color = Color.White,
-                            alpha = alpha
-                        ) {
-                            LyricsText(line, lyricsTypes, alpha, onDefinitionClicked)
-                        }
-                    } else {
-                        LyricsText(line, lyricsTypes, alpha, onDefinitionClicked)
-                    }
+                    LyricsText(line, lyricsTypes, line.isChoirPart, onDefinitionClicked)
                 }
             }
 
@@ -96,15 +78,14 @@ fun SwipeableLyricsView(
 private fun LyricsText(
     line: SongInfoTextLineViewObject,
     lyricsTypes: List<SongInfoViewModel.LyricsType>,
-    alpha: Float,
+    isChoir: Boolean,
     onDefinitionClicked: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
-            .padding(8.dp)
-            .alpha(alpha),
+            .padding(8.dp),
         verticalArrangement = Arrangement.Center
     ) {
         AnimatedVisibility(
@@ -117,9 +98,9 @@ private fun LyricsText(
                 modifier = Modifier.fillMaxWidth(),
                 text = line.text,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
+                fontWeight = if (isChoir) FontWeight.Bold else FontWeight.Light,
                 color = Color.White,
-                fontFamily = FontFamily.SansSerif,
+                fontFamily = FontFamily.Default,
                 fontSize = 20.sp,
             )
         }
@@ -141,8 +122,8 @@ private fun LyricsText(
                                     .padding(end = 8.dp),
                                 textAlign = TextAlign.Center,
                                 text = chunk.text,
-                                fontFamily = FontFamily.SansSerif,
-                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Default,
+                                fontWeight = if (isChoir) FontWeight.Bold else FontWeight.Light,
                                 fontSize = 20.sp,
                                 color = Color.White
                             )
@@ -157,8 +138,8 @@ private fun LyricsText(
                                     },
                                 textAlign = TextAlign.Center,
                                 text = chunk.text,
-                                fontFamily = FontFamily.SansSerif,
-                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Default,
+                                fontWeight = if (isChoir) FontWeight.Bold else FontWeight.Light,
                                 fontSize = 20.sp,
                                 color = Color.White,
                             )
@@ -184,8 +165,8 @@ private fun LyricsText(
                                 modifier = Modifier.wrapContentWidth(),
                                 textAlign = TextAlign.Center,
                                 text = chunk.text,
-                                fontFamily = FontFamily.SansSerif,
-                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Default,
+                                fontWeight = if (isChoir) FontWeight.Bold else FontWeight.Light,
                                 fontSize = 20.sp,
                                 color = Color.White
                             )
@@ -199,8 +180,8 @@ private fun LyricsText(
                                     },
                                 textAlign = TextAlign.Center,
                                 text = chunk.text,
-                                fontFamily = FontFamily.SansSerif,
-                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Default,
+                                fontWeight = if (isChoir) FontWeight.Bold else FontWeight.Light,
                                 fontSize = 20.sp,
                                 color = Color.White,
                             )
@@ -209,12 +190,5 @@ private fun LyricsText(
                 }
             }
         }
-    }
-}
-
-private fun calculateAlpha(currentIndex: Int, itemIndex: Int): Float {
-    return when {
-        itemIndex == currentIndex -> 1f
-        else -> 1f - (itemIndex - currentIndex) * 0.4f
     }
 }

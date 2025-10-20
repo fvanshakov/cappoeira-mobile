@@ -6,6 +6,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +31,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,11 +38,18 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
 import org.koin.mp.KoinPlatform.getKoin
 import ru.cappoeira.app.designSystem.elements.BottomSheet
@@ -50,7 +58,6 @@ import ru.cappoeira.app.designSystem.elements.chips.BigChip
 import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
 import ru.cappoeira.app.designSystem.elements.chips.SmallChip
 import ru.cappoeira.app.designSystem.elements.delimiter.SimpleDelimiter
-import ru.cappoeira.app.designSystem.elements.gaps.ScreenTopGap
 import ru.cappoeira.app.designSystem.elements.icons.BackIcon
 import ru.cappoeira.app.designSystem.elements.texts.GeneralText
 import ru.cappoeira.app.designSystem.elements.topbar.SwipeableTopbar
@@ -85,69 +92,63 @@ fun SongInfoScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     var definitionToShow = remember { mutableStateOf("") }
     val linesState = rememberLazyListState()
+    var scroll by remember { mutableStateOf(0f) }
 
-    val songTagsHeight by remember {
-        derivedStateOf {
-            val rowsNbr = (((state as? SongInfoUIState.Success)
-                ?.vo?.songTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1
-            val maxHeight = 34.dp * rowsNbr
-            val scroll = linesState.firstVisibleItemScrollOffset
-            var calculatedHeight = maxHeight - (scroll.dp / 2)
-            if (linesState.firstVisibleItemIndex != 0) {
-                calculatedHeight = 0.dp
-            }
 
-            calculatedHeight.coerceIn(0.dp, maxHeight)
-        }
+    val songTagsMaxHeight = 34.dp * ((((state as? SongInfoUIState.Success)
+        ?.vo?.songTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1)
+    val themesTagsMaxHeight = 34.dp * ((((state as? SongInfoUIState.Success)
+        ?.vo?.themeTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1)
+    val topSpacerMaxHeight = 75.dp
+    val maxFunctionalityPickerSize = 90.dp
+
+    var songTagsHeight by remember {
+        mutableStateOf(songTagsMaxHeight)
     }
 
-    val themesTagsHeight by remember {
-        derivedStateOf {
-            val rowsNbr = (((state as? SongInfoUIState.Success)
-                ?.vo?.themeTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1
-            val maxHeight = 34.dp * rowsNbr
-            val scroll = linesState.firstVisibleItemScrollOffset
-            var calculatedHeight = maxHeight - (scroll.dp / 2)
-            if (linesState.firstVisibleItemIndex != 0) {
-                calculatedHeight = 0.dp
-            }
-
-
-            calculatedHeight.coerceIn(0.dp, maxHeight)
-        }
+    var themesTagsHeight by remember {
+        mutableStateOf(themesTagsMaxHeight)
     }
 
-    val topSpacerHeight by remember {
-        derivedStateOf {
-            val maxHeight = 75.dp
-            val scroll = linesState.firstVisibleItemScrollOffset
-            var calculatedHeight = maxHeight - (scroll.dp / 2)
-            if (linesState.firstVisibleItemIndex != 0) {
-                calculatedHeight = 0.dp
-            }
-
-            calculatedHeight.coerceIn(0.dp, maxHeight)
-        }
+    var topSpacerHeight by remember {
+        mutableStateOf(topSpacerMaxHeight)
     }
 
-    val functionalityPickerSize by remember {
-        derivedStateOf {
-            val maxHeight = 90.dp
-            val scroll = linesState.firstVisibleItemScrollOffset
-            var calculatedHeight = maxHeight - (scroll.dp / 2)
-            if (linesState.firstVisibleItemIndex != 0) {
-                calculatedHeight = 0.dp
-            }
-
-
-            calculatedHeight.coerceIn(0.dp, maxHeight)
-        }
+    var functionalityPickerSize by remember {
+        mutableStateOf(maxFunctionalityPickerSize)
     }
 
     Box(
         Modifier
             .systemBarsPadding()
             .fillMaxSize()
+            .pointerInput(Unit) {
+                detectVerticalDragGestures { change, dragAmount ->
+                    change.consume()
+                    scroll = -dragAmount
+
+                    val areElementsHidden = songTagsHeight == 0.dp && themesTagsHeight == 0.dp && functionalityPickerSize == 0.dp && topSpacerHeight == 0.dp
+
+                    when {
+                        areElementsHidden && scroll > 0 -> {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                linesState.scrollBy(scroll)
+                            }
+                        }
+                        areElementsHidden && scroll < 0 && !(linesState.firstVisibleItemIndex == 0 && linesState.firstVisibleItemScrollOffset == 0) -> {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                linesState.scrollBy(scroll)
+                            }
+                        }
+                        else -> {
+                            songTagsHeight = (songTagsHeight - (scroll.dp / 2)).coerceIn(0.dp, songTagsMaxHeight)
+                            themesTagsHeight = (themesTagsHeight - (scroll.dp / 2)).coerceIn(0.dp, themesTagsMaxHeight)
+                            functionalityPickerSize = (functionalityPickerSize - (scroll.dp / 2)).coerceIn(0.dp, maxFunctionalityPickerSize)
+                            topSpacerHeight = (topSpacerHeight - (scroll.dp / 2)).coerceIn(0.dp, topSpacerMaxHeight)
+                        }
+                    }
+                }
+            }
     ) {
         Column(
             modifier = Modifier
@@ -354,6 +355,26 @@ fun SongInfoScreen(
             }
 
         }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.7f)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black)
+                        )
+                    )
+            )
+        }
+
         BugButton(modifier = Modifier.align(Alignment.BottomEnd))
     }
 

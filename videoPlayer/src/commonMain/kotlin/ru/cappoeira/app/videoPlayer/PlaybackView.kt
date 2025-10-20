@@ -45,15 +45,9 @@ fun PlaybackView(
     val playbackState = viewModel.playbackState.collectAsState()
 
     Box(
-        Modifier
-            .fillMaxWidth()
-            .height(16.dp)
-            .background(Color.Black)
-    )
-    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(270.dp)
+            .height(240.dp)
             .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
@@ -63,12 +57,7 @@ fun PlaybackView(
             hidePlayback = isCustom
         )
     }
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .height(16.dp)
-            .background(Color.Black)
-    )
+
 }
 
 @Composable

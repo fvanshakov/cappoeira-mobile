@@ -36,7 +36,7 @@ fun SwipeableTopbar(
         snapshotFlow { listState.firstVisibleItemIndex }.collect { offset ->
             if (offset > lastScrollOffset) {
                 isTopBarVisible = false
-            } else if (offset < lastScrollOffset) {
+            } else if (offset < lastScrollOffset && listState.firstVisibleItemIndex == 0) {
                 isTopBarVisible = true
             }
             lastScrollOffset = offset
