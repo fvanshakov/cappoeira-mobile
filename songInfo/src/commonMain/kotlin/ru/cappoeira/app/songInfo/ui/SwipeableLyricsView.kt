@@ -81,11 +81,17 @@ private fun LyricsText(
     isChoir: Boolean,
     onDefinitionClicked: (String) -> Unit
 ) {
+
+    val columnPaddings = if (lyricsTypes.size == 1) {
+        4.dp
+    } else {
+        8.dp
+    }
     Column(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(horizontal = 8.dp, vertical = columnPaddings),
         verticalArrangement = Arrangement.Center
     ) {
         AnimatedVisibility(
