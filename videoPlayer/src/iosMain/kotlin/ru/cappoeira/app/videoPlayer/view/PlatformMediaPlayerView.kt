@@ -26,6 +26,7 @@ actual fun PlatformMediaPlayerView(
     val avPlayerViewController = remember { AVPlayerViewController() }
     avPlayerViewController.player = remember { playbackStateController.avPlayer }
     avPlayerViewController.showsPlaybackControls = true
+    avPlayerViewController.requiresLinearPlayback = true
     avPlayerViewController.view.setFrame(CGRectMake(0.0, 0.0, 0.10, 0.10))
 
     UIKitView(

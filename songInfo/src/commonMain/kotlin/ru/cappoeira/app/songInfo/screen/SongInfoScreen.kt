@@ -247,17 +247,19 @@ fun SongInfoScreen(
                         isShimmering = false,
                         modifier = Modifier
                             .height(functionalityPickerSize)
+                            .padding(horizontal = 8.dp)
                             .animateContentSize(),
                         onClick = {  },
                         Content = {
                             Row(
-                                horizontalArrangement = Arrangement.Center,
+                                horizontalArrangement = Arrangement.SpaceEvenly,
                                 modifier = Modifier
                                     .wrapContentHeight()
                                     .fillMaxWidth()
                             ) {
                                 SongInfoViewModel.FunctionalityType.entries.forEach {
                                     BigChip(
+                                        paddingValues = PaddingValues(8.dp),
                                         isSelected = chosenFunctionality == it,
                                         text = it.stringValue,
                                         onClick = {
@@ -294,7 +296,7 @@ fun SongInfoScreen(
                                             text = type.stringValue,
                                             additionalColor = Color.LightGray,
                                             additionalTextColor = Color.Black,
-                                            paddingValues = PaddingValues(vertical = 16.dp,  horizontal = 4.dp),
+                                            paddingValues = PaddingValues(vertical = 8.dp,  horizontal = 4.dp),
                                             onClick = {
                                                 viewModel.handleEvent(SongInfoEvent.ChangeSongLyricsType(type))
                                             },

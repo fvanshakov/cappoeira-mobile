@@ -37,11 +37,12 @@ fun BigChip(
     textColor: Color = Color.White,
     additionalTextColor: Color = Color.White,
     paddingValues: PaddingValues = PaddingValues(16.dp),
-    fontSize: TextUnit = 18.sp
+    fontSize: TextUnit = 18.sp,
+    modifier: Modifier = Modifier.wrapContentWidth()
 ) {
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(paddingValues)
             .clip(RoundedCornerShape(8.dp))
             .background(

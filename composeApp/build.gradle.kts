@@ -65,6 +65,7 @@ kotlin {
             implementation(projects.songInfo)
             implementation(projects.topbar)
             implementation(projects.analytics)
+            implementation(projects.lifecycle)
         }
     }
 }

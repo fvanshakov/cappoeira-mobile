@@ -64,6 +64,8 @@ kotlin {
                 implementation(libs.koin.compose.viewmodel)
 
                 implementation(projects.network)
+                implementation(projects.lifecycle)
+                implementation(projects.designSystem)
             }
         }
 

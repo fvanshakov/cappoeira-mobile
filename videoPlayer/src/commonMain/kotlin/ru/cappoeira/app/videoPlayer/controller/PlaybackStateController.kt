@@ -25,5 +25,6 @@ expect class PlaybackStateController {
     fun duration(): Long
     fun currentPosition(): Long
     fun seekTo(position: Long)
+    fun moveForward(sec: Double)
     fun addItems(items: List<PlaybackMediaItem>)
 }

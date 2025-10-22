@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import ru.cappoeira.app.videoPlayer.controller.PlaybackMediaItem
 import ru.cappoeira.app.videoPlayer.controller.PlaybackState
 import ru.cappoeira.app.videoPlayer.controller.PlaybackStateController
+import ru.cappoeira.lifecycle.AppLifecycle
 
 class PlaybackViewModel(
     private val playbackStateController: PlaybackStateController,
@@ -38,6 +39,11 @@ class PlaybackViewModel(
                     url = url
                 )
             )
+            AppLifecycle.stateFlow.collect {
+                if (it == AppLifecycle.AppState.BACKGROUND) {
+                    pause()
+                }
+            }
         }
     }
 
@@ -63,6 +69,10 @@ class PlaybackViewModel(
             playbackStateController.seekTo((seekValue * playbackStateController.duration()).toLong())
             _progressState.value = seekValue
         }
+    }
+
+    fun moveForward(secs: Double) {
+        playbackStateController.moveForward(secs)
     }
 
     fun pause() {

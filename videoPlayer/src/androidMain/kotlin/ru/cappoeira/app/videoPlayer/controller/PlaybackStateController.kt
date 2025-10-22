@@ -65,6 +65,12 @@ actual class PlaybackStateController(private val media3PlayerComponent: Media3Pl
         return media3PlayerComponent.getMediaController()?.currentPosition ?: 0L
     }
 
+    actual fun moveForward(sec: Double) {
+        val currentPosition = media3PlayerComponent.getMediaController()?.currentPosition ?: 0
+        val newPosition = currentPosition + sec.toLong() * 1000
+        media3PlayerComponent.getMediaController()?.seekTo(newPosition)
+    }
+
     actual fun seekTo(position: Long) {
         media3PlayerComponent.getMediaController()?.seekTo(position)
     }

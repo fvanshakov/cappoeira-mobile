@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,13 +33,14 @@ fun Chip(
     text: String,
     isClosable: Boolean = false,
     inactiveColor: Color = Color.LightGray,
+    paddings: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     onClick: (() -> Unit)? = null,
     onClose: (() -> Unit)? = null
 ) {
 
     Row(
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(paddings)
             .clip(RoundedCornerShape(16.dp))
             .background(
                 color = if (isSelected) DesignColors.Orange else inactiveColor

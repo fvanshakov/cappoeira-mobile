@@ -17,6 +17,7 @@ import platform.AVFoundation.replaceCurrentItemWithPlayerItem
 import platform.AVFoundation.seekToTime
 import platform.CoreMedia.CMTimeGetSeconds
 import platform.CoreMedia.CMTimeMake
+import platform.CoreMedia.CMTimeMakeWithSeconds
 import platform.Foundation.NSTimer
 import platform.Foundation.NSURL
 
@@ -84,6 +85,12 @@ actual class PlaybackStateController {
     actual fun seekTo(position: Long) {
         val seekPosition = CMTimeMake(position, 1)
         avPlayer.seekToTime(seekPosition)
+    }
+
+    actual fun moveForward(sec: Double) {
+        val currentTime = CMTimeGetSeconds(avPlayer.currentTime())
+        val newTime = currentTime + sec
+        avPlayer.seekToTime(CMTimeMakeWithSeconds(newTime, preferredTimescale = 600))
     }
 
     actual fun addItems(items: List<PlaybackMediaItem>) {

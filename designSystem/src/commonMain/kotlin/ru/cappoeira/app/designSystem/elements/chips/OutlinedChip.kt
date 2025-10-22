@@ -34,7 +34,9 @@ fun OutlinedChip(
     isShimmering: Boolean = false,
     alpha: Float = 1.0f,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Absolute.SpaceAround,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
+        .padding(horizontal = 16.dp)
+        .padding(vertical = 8.dp),
     Content: @Composable (() -> Unit),
 ) {
     val transition = rememberInfiniteTransition()
@@ -63,10 +65,8 @@ fun OutlinedChip(
     )
 
     var applicableModifier = modifier
-        .padding(horizontal = 16.dp)
         .fillMaxWidth()
         .wrapContentHeight()
-        .padding(vertical = 8.dp)
         .drawBehind {
             drawRoundRect(color = color.copy(alpha = alpha), style = stroke)
         }
