@@ -12,11 +12,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,10 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
 import ru.cappoeira.app.designSystem.elements.colors.DesignColors
 import ru.cappoeira.app.designSystem.elements.gaps.SimpleGap
 import ru.cappoeira.app.songInfo.modles.SongInfoTextLineViewObject
+import ru.cappoeira.app.songInfo.modles.SongTextChunkViewObject
 import ru.cappoeira.app.songInfo.viewmodel.SongInfoViewModel
 
 @Composable
@@ -165,32 +168,79 @@ private fun LyricsText(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    line.transcription.forEach { chunk ->
-                        if (chunk.definition == null) {
-                            Text(
-                                modifier = Modifier.wrapContentWidth(),
-                                textAlign = TextAlign.Center,
-                                text = chunk.text,
-                                fontFamily = FontFamily.Default,
-                                fontWeight = if (isChoir) FontWeight.Bold else FontWeight.Light,
-                                fontSize = 20.sp,
-                                color = Color.White
-                            )
-                        } else {
-                            Text(
-                                modifier = Modifier
-                                    .wrapContentWidth()
-                                    .background(DesignColors.Orange, CircleShape)
-                                    .clickable {
-                                        onDefinitionClicked(chunk.definition)
-                                    },
-                                textAlign = TextAlign.Center,
-                                text = chunk.text,
-                                fontFamily = FontFamily.Default,
-                                fontWeight = if (isChoir) FontWeight.Bold else FontWeight.Light,
-                                fontSize = 20.sp,
-                                color = Color.White,
-                            )
+                    val buffer = ArrayDeque<SongTextChunkViewObject>()
+
+                    line.transcription.forEachIndexed { index, chunk ->
+
+                        if (buffer.lastOrNull()?.text?.endsWith(" ") == true) {
+                            Row(modifier = Modifier.wrapContentWidth()) {
+                                buffer.forEach { bufferedElement ->
+                                    val definition = bufferedElement.definition
+                                    if (definition == null) {
+                                        Text(
+                                            modifier = Modifier.wrapContentWidth(),
+                                            textAlign = TextAlign.Center,
+                                            text = bufferedElement.text,
+                                            fontFamily = FontFamily.Default,
+                                            fontWeight = if (isChoir) FontWeight.Bold else FontWeight.Light,
+                                            fontSize = 20.sp,
+                                            color = Color.White
+                                        )
+                                    } else {
+                                        Text(
+                                            modifier = Modifier
+                                                .wrapContentWidth()
+                                                .background(DesignColors.Orange, CircleShape)
+                                                .clickable {
+                                                    onDefinitionClicked(definition)
+                                                },
+                                            textAlign = TextAlign.Center,
+                                            text = bufferedElement.text,
+                                            fontFamily = FontFamily.Default,
+                                            fontWeight = if (isChoir) FontWeight.Bold else FontWeight.Light,
+                                            fontSize = 20.sp,
+                                            color = Color.White,
+                                        )
+                                    }
+                                }
+                            }
+                            buffer.clear()
+                        }
+
+                        buffer.add(chunk)
+                    }
+
+                    if (buffer.isNotEmpty()) {
+                        Row(modifier = Modifier.wrapContentWidth()) {
+                            buffer.forEach { bufferedElement ->
+                                val definition = bufferedElement.definition
+                                if (definition == null) {
+                                    Text(
+                                        modifier = Modifier.wrapContentWidth(),
+                                        textAlign = TextAlign.Center,
+                                        text = bufferedElement.text,
+                                        fontFamily = FontFamily.Default,
+                                        fontWeight = if (isChoir) FontWeight.Bold else FontWeight.Light,
+                                        fontSize = 20.sp,
+                                        color = Color.White
+                                    )
+                                } else {
+                                    Text(
+                                        modifier = Modifier
+                                            .wrapContentWidth()
+                                            .background(DesignColors.Orange, CircleShape)
+                                            .clickable {
+                                                onDefinitionClicked(definition)
+                                            },
+                                        textAlign = TextAlign.Center,
+                                        text = bufferedElement.text,
+                                        fontFamily = FontFamily.Default,
+                                        fontWeight = if (isChoir) FontWeight.Bold else FontWeight.Light,
+                                        fontSize = 20.sp,
+                                        color = Color.White,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
