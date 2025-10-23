@@ -9,7 +9,8 @@ data class SongInfoByIdResponse(
     val videoUrl: String?,
     val songLines: List<SongLine>,
     val songTags: SongTags,
-    val optimalTransitions: List<Transition>
+    val optimalTransitions: List<Transition>,
+    val warning: String?
 )
 
 @Serializable

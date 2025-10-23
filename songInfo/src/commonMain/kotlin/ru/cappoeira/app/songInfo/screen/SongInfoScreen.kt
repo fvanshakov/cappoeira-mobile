@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -41,12 +43,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -58,6 +58,7 @@ import ru.cappoeira.app.designSystem.elements.chips.BigChip
 import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
 import ru.cappoeira.app.designSystem.elements.chips.SmallChip
 import ru.cappoeira.app.designSystem.elements.delimiter.SimpleDelimiter
+import ru.cappoeira.app.designSystem.elements.icons.AlertCircleIcon
 import ru.cappoeira.app.designSystem.elements.icons.BackIcon
 import ru.cappoeira.app.designSystem.elements.texts.GeneralText
 import ru.cappoeira.app.designSystem.elements.topbar.SwipeableTopbar
@@ -95,18 +96,22 @@ fun SongInfoScreen(
     var scroll by remember { mutableStateOf(0f) }
 
 
-    val songTagsMaxHeight = 34.dp * ((((state as? SongInfoUIState.Success)
-        ?.vo?.songTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1)
-    val themesTagsMaxHeight = 34.dp * ((((state as? SongInfoUIState.Success)
-        ?.vo?.themeTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1)
+    val songTagsMaxHeight = remember(state) {
+        34.dp * ((((state as? SongInfoUIState.Success)
+            ?.vo?.songTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1)
+    }
+    val themesTagsMaxHeight = remember(state) {
+        34.dp * ((((state as? SongInfoUIState.Success)
+            ?.vo?.themeTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1)
+    }
     val topSpacerMaxHeight = 75.dp
     val maxFunctionalityPickerSize = 90.dp
 
-    var songTagsHeight by remember {
+    var songTagsHeight by remember(state) {
         mutableStateOf(songTagsMaxHeight)
     }
 
-    var themesTagsHeight by remember {
+    var themesTagsHeight by remember(state) {
         mutableStateOf(themesTagsMaxHeight)
     }
 
@@ -173,6 +178,7 @@ fun SongInfoScreen(
 
                     FlowRow(
                         modifier = Modifier
+                            .padding(horizontal = 16.dp)
                             .height(songTagsHeight)
                             .animateContentSize()
                     ) {
@@ -193,6 +199,7 @@ fun SongInfoScreen(
                     }
                     FlowRow(
                         modifier = Modifier
+                            .padding(horizontal = 16.dp)
                             .height(themesTagsHeight)
                             .animateContentSize()
                     ) {
@@ -242,34 +249,39 @@ fun SongInfoScreen(
                         }
                     }
 
-                    OutlinedChip(
-                        color = Color.White,
-                        isShimmering = false,
-                        modifier = Modifier
-                            .height(functionalityPickerSize)
-                            .padding(horizontal = 8.dp)
-                            .animateContentSize(),
-                        onClick = {  },
-                        Content = {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                modifier = Modifier
-                                    .wrapContentHeight()
-                                    .fillMaxWidth()
-                            ) {
-                                SongInfoViewModel.FunctionalityType.entries.forEach {
-                                    BigChip(
-                                        paddingValues = PaddingValues(8.dp),
-                                        isSelected = chosenFunctionality == it,
-                                        text = it.stringValue,
-                                        onClick = {
-                                            viewModel.handleEvent(SongInfoEvent.ChangeChosenFunctionality(it))
-                                        }
-                                    )
+                    Box(
+                        modifier = Modifier.padding(
+                            horizontal = 16.dp
+                        )
+                    ) {
+                        OutlinedChip(
+                            color = Color.White,
+                            isShimmering = false,
+                            modifier = Modifier
+                                .height(functionalityPickerSize)
+                                .animateContentSize(),
+                            onClick = {  },
+                            Content = {
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    modifier = Modifier
+                                        .wrapContentHeight()
+                                        .fillMaxWidth()
+                                ) {
+                                    SongInfoViewModel.FunctionalityType.entries.forEach {
+                                        BigChip(
+                                            paddingValues = PaddingValues(8.dp),
+                                            isSelected = chosenFunctionality == it,
+                                            text = it.stringValue,
+                                            onClick = {
+                                                viewModel.handleEvent(SongInfoEvent.ChangeChosenFunctionality(it))
+                                            }
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
 
                     this@Column.AnimatedVisibility(
                         visible = chosenFunctionality == SongInfoViewModel.FunctionalityType.TEXT,
@@ -424,6 +436,24 @@ fun SongInfoScreen(
                 text = songName,
                 color = Color.Black
             )
+            val state = state as? SongInfoUIState.Success
+            Box(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .height(36.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                state?.vo?.warning?.let {
+                    AlertCircleIcon(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clickable {
+                            definitionToShow.value = it
+                            showBottomSheet = true
+                        }
+                    )
+                }
+            }
         }
     }
 

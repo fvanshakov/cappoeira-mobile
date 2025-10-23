@@ -9,8 +9,8 @@ class SongInfoByIdViewObject(
     val songLines: List<SongInfoTextLineViewObject>,
     val songTags: SongTagsViewObject,
     val themeTags: SongTagsViewObject,
-    val optimalTransitions: List<Transition>
-
+    val optimalTransitions: List<Transition>,
+    val warning: String?
 )
 
 data class SongInfoTextLineViewObject(

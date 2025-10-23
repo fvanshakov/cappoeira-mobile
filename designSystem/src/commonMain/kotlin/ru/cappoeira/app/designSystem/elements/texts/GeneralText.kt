@@ -18,11 +18,12 @@ import androidx.compose.ui.unit.sp
 fun GeneralText(
     text: String,
     color: Color? = null,
-    verticalPadding: Dp = 8.dp
+    verticalPadding: Dp = 8.dp,
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = text,
-        modifier = Modifier
+        modifier = modifier
             .wrapContentWidth()
             .padding(horizontal = 16.dp, verticalPadding),
         fontFamily = FontFamily.SansSerif,
