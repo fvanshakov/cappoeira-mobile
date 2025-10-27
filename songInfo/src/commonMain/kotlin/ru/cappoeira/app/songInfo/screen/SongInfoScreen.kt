@@ -98,11 +98,11 @@ fun SongInfoScreen(
 
     val songTagsMaxHeight = remember(state) {
         34.dp * ((((state as? SongInfoUIState.Success)
-            ?.vo?.songTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1)
+            ?.vo?.songTags?.tagsWithValues?.entries?.flatMap { it.value }?.size ?: 1) - 1) / 3 + 1)
     }
     val themesTagsMaxHeight = remember(state) {
         34.dp * ((((state as? SongInfoUIState.Success)
-            ?.vo?.themeTags?.tagsWithValues?.size ?: 1) - 1) / 3 + 1)
+            ?.vo?.themeTags?.tagsWithValues?.entries?.flatMap { it.value }?.size ?: 1) - 1) / 3 + 1)
     }
     val topSpacerMaxHeight = 75.dp
     val maxFunctionalityPickerSize = 90.dp
@@ -180,7 +180,8 @@ fun SongInfoScreen(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .height(songTagsHeight)
-                            .animateContentSize()
+                            .animateContentSize(),
+                        maxItemsInEachRow = 3
                     ) {
                         vo.songTags.tagsWithValues
                             .flatMap { tagsWithKeys ->
@@ -201,7 +202,8 @@ fun SongInfoScreen(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .height(themesTagsHeight)
-                            .animateContentSize()
+                            .animateContentSize(),
+                        maxItemsInEachRow = 3
                     ) {
                         vo.themeTags.tagsWithValues
                             .flatMap { tagsWithKeys ->
