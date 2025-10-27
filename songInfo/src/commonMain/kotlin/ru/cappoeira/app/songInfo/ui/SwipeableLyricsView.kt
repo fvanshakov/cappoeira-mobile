@@ -127,8 +127,7 @@ private fun LyricsText(
                     line.translation.forEach { chunk ->
                         if (chunk.definition == null) {
                             Text(
-                                modifier = Modifier.wrapContentWidth()
-                                    .padding(end = 8.dp),
+                                modifier = Modifier.wrapContentWidth(),
                                 textAlign = TextAlign.Center,
                                 text = chunk.text,
                                 fontFamily = FontFamily.Default,
@@ -141,7 +140,6 @@ private fun LyricsText(
                                 modifier = Modifier
                                     .wrapContentWidth()
                                     .background(DesignColors.Orange, CircleShape)
-                                    .padding(horizontal = 8.dp)
                                     .clickable {
                                         onDefinitionClicked(chunk.definition)
                                     },
@@ -173,7 +171,10 @@ private fun LyricsText(
                     line.transcription.forEachIndexed { index, chunk ->
 
                         if (buffer.lastOrNull()?.text?.endsWith(" ") == true) {
-                            Row(modifier = Modifier.wrapContentWidth()) {
+                            Row(
+                                modifier = Modifier.wrapContentWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
                                 buffer.forEach { bufferedElement ->
                                     val definition = bufferedElement.definition
                                     if (definition == null) {
