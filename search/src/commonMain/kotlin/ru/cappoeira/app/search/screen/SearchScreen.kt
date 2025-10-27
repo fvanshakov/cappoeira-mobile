@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,7 @@ import ru.cappoeira.app.designSystem.elements.BugButton
 import ru.cappoeira.app.designSystem.elements.chips.BigChip
 import ru.cappoeira.app.designSystem.elements.chips.Chip
 import ru.cappoeira.app.designSystem.elements.chips.OutlinedChip
+import ru.cappoeira.app.designSystem.elements.colors.DesignColors
 import ru.cappoeira.app.designSystem.elements.gaps.TopBarGap
 import ru.cappoeira.app.designSystem.elements.searchField.SearchField
 import ru.cappoeira.app.designSystem.elements.texts.GeneralText
@@ -199,38 +201,55 @@ fun SearchScreen(
             BottomSheet(
                 onDismiss = { showBottomSheet = false }
             ) {
-                LazyColumn(
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                ) {
-                    tags.entries.forEach { (key, value) ->
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                GeneralText(text = key)
+                if (tags.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .height(80.dp)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
+
+                    ) {
+                        CircularProgressIndicator(
+                            color = DesignColors.Orange,
+                            strokeWidth = 8.dp,
+                            modifier = Modifier
+                                .size(56.dp),
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    ) {
+                        tags.entries.forEach { (key, value) ->
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    GeneralText(text = key)
+                                }
                             }
-                        }
-                        item {
-                            FlowRow {
-                                value.values.forEach { tag ->
-                                    val event = SearchEvent.SelectTag(
-                                        key = key,
-                                        value = tag.value,
-                                        isPlural = value.isPlural
-                                    )
-                                    BigChip(
-                                        isSelected = tag.isChosen,
-                                        text = tag.value,
-                                        onClick = {
-                                            viewModel.handleEvent(
-                                                event
-                                            )
-                                        },
-                                        additionalColor = Color.LightGray,
-                                        paddingValues = PaddingValues(4.dp)
-                                    )
+                            item {
+                                FlowRow {
+                                    value.values.forEach { tag ->
+                                        val event = SearchEvent.SelectTag(
+                                            key = key,
+                                            value = tag.value,
+                                            isPlural = value.isPlural
+                                        )
+                                        BigChip(
+                                            isSelected = tag.isChosen,
+                                            text = tag.value,
+                                            onClick = {
+                                                viewModel.handleEvent(
+                                                    event
+                                                )
+                                            },
+                                            additionalColor = Color.LightGray,
+                                            paddingValues = PaddingValues(4.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
