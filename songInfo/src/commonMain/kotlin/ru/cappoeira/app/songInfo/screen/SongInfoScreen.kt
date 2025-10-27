@@ -230,8 +230,6 @@ fun SongInfoScreen(
                         ) {
                             PlaybackView(
                                 isCustom = false,
-                                id = vo.id,
-                                url = url,
                                 viewModel = usablePlayBackViewModel
                             )
                         }

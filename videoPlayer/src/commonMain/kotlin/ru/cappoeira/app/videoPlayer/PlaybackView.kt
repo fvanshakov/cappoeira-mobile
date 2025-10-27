@@ -4,36 +4,36 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.IconButton
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import ru.cappoeira.app.designSystem.elements.chips.BigChip
-import ru.cappoeira.app.designSystem.elements.chips.Chip
+import ru.cappoeira.app.designSystem.elements.colors.DesignColors
 import ru.cappoeira.app.videoPlayer.controller.PlaybackState
 import ru.cappoeira.app.videoPlayer.view.PlatformMediaPlayerView
 
@@ -41,17 +41,13 @@ import ru.cappoeira.app.videoPlayer.view.PlatformMediaPlayerView
 @Composable
 fun PlaybackView(
     isCustom: Boolean,
-    url: String,
-    id: String,
     viewModel: PlaybackViewModel
 ) {
-    val controller = remember { viewModel.getPlatformController() }
-    val playbackState = viewModel.playbackState.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(280.dp)
+            .height(240.dp)
             .background(Color.Black),
     ) {
         Box(
@@ -63,42 +59,20 @@ fun PlaybackView(
         ) {
             PlatformMediaPlayerView(
                 modifier = Modifier,
-                controller,
+                viewModel,
                 hidePlayback = isCustom
             )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            BigChip(
-                isSelected = true,
-                paddingValues = PaddingValues(),
-                text = "<<",
-                onClick = { viewModel.moveForward(-10.0) },
-                modifier = Modifier.fillMaxWidth(0.5f).padding(start = 16.dp, end = 8.dp)
-            )
-            BigChip(
-                isSelected = true,
-                paddingValues = PaddingValues(),
-                text = ">>",
-                onClick = { viewModel.moveForward(10.0) },
-                modifier = Modifier.fillMaxWidth().padding(end = 16.dp, start = 8.dp)
-            )
+            PlaybackBufferingIndicator(viewModel)
+            PlayPauseControl(viewModel)
+            PlaybackSeekBar(viewModel)
         }
     }
 }
 
 @Composable
 fun PlaybackBufferingIndicator(
-    id: String,
-    url: String
+    viewModel: PlaybackViewModel
 ) {
-    val viewModel: PlaybackViewModel = koinViewModel(
-        parameters = { parametersOf(url, id) }
-    )
     val state = viewModel.playBackStateUI.collectAsState()
     AnimatedVisibility(
         visible = state.value == PlaybackState.Buffering,
@@ -106,7 +80,7 @@ fun PlaybackBufferingIndicator(
         exit = fadeOut()
     ) {
         CircularProgressIndicator(
-            color = Color.Blue,
+            color = DesignColors.Orange,
             strokeWidth = 4.dp,
             modifier = Modifier.wrapContentSize()
         )
@@ -115,10 +89,14 @@ fun PlaybackBufferingIndicator(
 
 
 @Composable
-fun PlaybackSeekBar() {
-    val viewModel: PlaybackViewModel = koinViewModel()
+fun PlaybackSeekBar(
+    viewModel: PlaybackViewModel
+) {
     val state = viewModel.progressStateUI.collectAsState()
-    Column {
+    Column(
+        modifier = Modifier.fillMaxHeight(),
+        verticalArrangement = Arrangement.Bottom
+    ) {
         Slider(
             value = state.value,
             onValueChange = {
@@ -128,9 +106,9 @@ fun PlaybackSeekBar() {
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             colors = SliderDefaults.colors(
-                activeTrackColor = Color.Red,
-                inactiveTickColor = Color.Red.copy(alpha = 1.0f),
-                thumbColor = Color.Red
+                activeTrackColor = DesignColors.Orange,
+                inactiveTickColor = Color.White,
+                thumbColor = DesignColors.Orange
             )
         )
     }
@@ -139,30 +117,41 @@ fun PlaybackSeekBar() {
 
 @Composable
 fun PlayPauseControl(
-    url: String,
-    id: String,
-    onPlayPause: () -> Unit
+    viewModel: PlaybackViewModel,
 ) {
-    val viewModel: PlaybackViewModel = koinViewModel(
-        parameters = { parametersOf(url, id) }
-    )
     val state = viewModel.playBackStateUI.collectAsState()
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
+            .fillMaxSize()
     ) {
-        IconButton(
-            onClick = onPlayPause,
-            modifier = Modifier
-                .size(56.dp)
-                .background(Color.Gray, CircleShape)
+        val interactionSource = remember { MutableInteractionSource() }
+
+
+        AnimatedVisibility(
+            visible = state.value == PlaybackState.Paused,
+            enter = fadeIn(),
+            exit = fadeOut()
         ) {
-            val icon = if (state.value == PlaybackState.Playing) "❚❚" else "▶"
-            Text(icon, fontSize = 24.sp, color = Color.White)
+            Text(
+                "▶",
+                fontSize = 56.sp,
+                color = DesignColors.Orange,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = ripple(
+                            radius = 60.dp,
+                            color = DesignColors.Orange
+                        )
+                    ) {
+                        viewModel.playPause()
+                    }
+            )
         }
     }
 }

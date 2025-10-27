@@ -60,14 +60,14 @@ class PlaybackViewModel(
             playPause()
             playbackStateController.setItem(playbackMediaItem)
         } catch (e: Exception) {
-            _playBackState.value = PlaybackState.Error("Exception was thrown.")
+
         }
     }
 
     fun onSeekChanged(seekValue: Float) {
         viewModelScope.launch {
-            playbackStateController.seekTo((seekValue * playbackStateController.duration()).toLong())
             _progressState.value = seekValue
+            playbackStateController.seekTo((seekValue * playbackStateController.duration()).toLong())
         }
     }
 

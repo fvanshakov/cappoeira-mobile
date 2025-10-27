@@ -3,18 +3,18 @@ package ru.cappoeira.app.videoPlayer.controller
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerItem
+import platform.AVFoundation.AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate
 import platform.AVFoundation.AVQueuePlayer
 import platform.AVFoundation.currentItem
 import platform.AVFoundation.currentTime
 import platform.AVFoundation.duration
-import platform.AVFoundation.isPlaybackBufferEmpty
-import platform.AVFoundation.isPlaybackBufferFull
 import platform.AVFoundation.isPlaybackLikelyToKeepUp
 import platform.AVFoundation.pause
 import platform.AVFoundation.play
 import platform.AVFoundation.rate
 import platform.AVFoundation.replaceCurrentItemWithPlayerItem
 import platform.AVFoundation.seekToTime
+import platform.AVFoundation.timeControlStatus
 import platform.CoreMedia.CMTimeGetSeconds
 import platform.CoreMedia.CMTimeMake
 import platform.CoreMedia.CMTimeMakeWithSeconds
@@ -32,13 +32,8 @@ actual class PlaybackStateController {
         playbackState: (PlaybackState) -> Unit
     ) {
         NSTimer.scheduledTimerWithTimeInterval(1.0, true) {
-            if (isPlaying()) {
-                callback(currentPosition(), duration())
-                playbackState(playerState())
-            }
-            if (avPlayer.currentItem?.isPlaybackBufferEmpty() == true) {
-                playbackState(PlaybackState.Buffering)
-            }
+            callback(currentPosition(), duration())
+            playbackState(playerState())
         }
     }
 
@@ -100,16 +95,10 @@ actual class PlaybackStateController {
     }
 
     private fun playerState(): PlaybackState {
-        val item = avPlayer.currentItem
         return when {
-            item?.isPlaybackLikelyToKeepUp() == true || item?.isPlaybackBufferFull() == true -> {
-                PlaybackState.Playing
-            }
-            item?.isPlaybackBufferEmpty() == true -> { PlaybackState.Buffering }
-            avPlayer.error != null -> {
-                PlaybackState.Error(avPlayer.error!!.code().toString() + "Something went wrong")
-            }
-            else -> { PlaybackState.Buffering }
+            isPlaying() -> { PlaybackState.Playing }
+            avPlayer.currentItem?.isPlaybackLikelyToKeepUp() == false-> { PlaybackState.Buffering }
+            else -> { PlaybackState.Paused }
         }
     }
 }

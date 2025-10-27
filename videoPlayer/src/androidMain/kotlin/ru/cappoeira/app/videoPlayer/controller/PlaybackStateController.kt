@@ -26,11 +26,15 @@ actual class PlaybackStateController(private val media3PlayerComponent: Media3Pl
                     if (media3PlayerComponent.getMediaController() != null &&
                         media3PlayerComponent.getMediaController()?.isPlaying == true) {
                         callback(currentPosition(), duration())
-                        playbackState(PlaybackState.Playing)
                     }
                     val state = media3PlayerComponent.getMediaController()?.playbackState
-                    if (state == Player.STATE_BUFFERING) {
-                        playbackState(PlaybackState.Buffering)
+                    when {
+                        state == Player.STATE_BUFFERING -> playbackState(PlaybackState.Buffering)
+                        media3PlayerComponent.getMediaController() != null &&
+                                media3PlayerComponent.getMediaController()?.isPlaying == true -> {
+                            playbackState(PlaybackState.Playing)
+                                }
+                        else -> playbackState(PlaybackState.Paused)
                     }
                     handler.postDelayed(this, 1000)
                 }
@@ -73,6 +77,7 @@ actual class PlaybackStateController(private val media3PlayerComponent: Media3Pl
 
     actual fun seekTo(position: Long) {
         media3PlayerComponent.getMediaController()?.seekTo(position)
+
     }
 
     actual fun play(playbackState: (PlaybackState) -> Unit) {
