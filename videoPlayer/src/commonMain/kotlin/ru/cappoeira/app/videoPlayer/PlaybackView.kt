@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import ru.cappoeira.app.designSystem.elements.colors.DesignColors
+import ru.cappoeira.app.designSystem.elements.icons.PlayIcon
 import ru.cappoeira.app.videoPlayer.controller.PlaybackState
 import ru.cappoeira.app.videoPlayer.view.PlatformMediaPlayerView
 
@@ -135,22 +136,10 @@ fun PlayPauseControl(
             enter = fadeIn(),
             exit = fadeOut()
         ) {
-            Text(
-                "▶",
-                fontSize = 56.sp,
-                color = DesignColors.Orange,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = ripple(
-                            radius = 60.dp,
-                            color = DesignColors.Orange
-                        )
-                    ) {
-                        viewModel.playPause()
-                    }
+            PlayIcon(
+                onClick = {
+                    viewModel.playPause()
+                }
             )
         }
     }

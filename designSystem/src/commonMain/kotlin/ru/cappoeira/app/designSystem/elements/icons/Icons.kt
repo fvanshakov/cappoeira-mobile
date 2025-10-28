@@ -1,6 +1,7 @@
 package ru.cappoeira.app.designSystem.elements.icons
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,12 +12,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import ru.cappoeira.app.designSystem.elements.colors.DesignColors
 import ru.cappoeira.app.topbar.BackArrowIcon
 import ru.cappoeira.app.topbar.CloseCrossIcon
 
@@ -137,5 +140,34 @@ fun AlertCircleIcon(
         painter = rememberVectorPainter(icon),
         contentDescription = "Alert",
         modifier = modifier
+    )
+}
+
+@Composable
+fun PlayIcon(
+    onClick: () -> Unit
+) {
+    val icon = ImageVector.Builder(
+        name = "PlayIcon",
+        defaultWidth = 50.dp,
+        defaultHeight = 50.dp,
+        viewportWidth = 50f,
+        viewportHeight = 50f
+    ).apply {
+        path(
+            fill = SolidColor(DesignColors.Orange),
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(16f, 10f)
+            lineTo(38f, 24f)
+            lineTo(16f, 38f)
+            close()
+        }
+    }.build()
+
+    Image(
+        painter = rememberVectorPainter(icon),
+        contentDescription = "Alert",
+        modifier = Modifier.clickable { onClick() }
     )
 }
