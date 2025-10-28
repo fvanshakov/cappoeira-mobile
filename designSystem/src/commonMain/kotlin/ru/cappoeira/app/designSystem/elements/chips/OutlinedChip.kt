@@ -7,6 +7,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -16,15 +17,12 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -49,38 +47,31 @@ fun OutlinedChip(
         )
     )
 
-    val shimmerBrush = Brush.linearGradient(
+    val shimmerBrush = remember { Brush.linearGradient(
         colors = listOf(
             Color.LightGray.copy(alpha = 0.6f),
             Color.White.copy(alpha = 0.2f),
             Color.LightGray.copy(alpha = 0.6f)
         ),
-        start = Offset(x = shimmerTranslate - 1000f, y = 0f),
-        end = Offset(x = shimmerTranslate, y = 0f)
-    )
-
-    val stroke = Stroke(
-        width = 6f,
-        pathEffect = PathEffect.cornerPathEffect(50f)
-    )
-
-    var applicableModifier = modifier
-        .fillMaxWidth()
-        .wrapContentHeight()
-        .drawBehind {
-            drawRoundRect(color = color.copy(alpha = alpha), style = stroke)
-        }
-
-    if (isShimmering) {
-        applicableModifier = applicableModifier
-            .clip(RoundedCornerShape(36))
-            .background(shimmerBrush)
-    }
+        start = Offset.Zero,
+        end = Offset(1000f, 0f)
+    ) }
 
     Row(
         horizontalArrangement = horizontalArrangement,
-        modifier = applicableModifier
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clip(RoundedCornerShape(15.dp))
+            .border(
+                width = 3.dp,
+                color = color.copy(alpha = alpha),
+                shape = RoundedCornerShape(15.dp)
+            )
             .clickable { onClick() }
+            .then(
+                if (isShimmering) Modifier.background(shimmerBrush) else Modifier
+            )
     ) {
         Content()
     }

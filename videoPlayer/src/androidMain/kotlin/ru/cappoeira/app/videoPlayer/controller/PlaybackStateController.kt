@@ -12,6 +12,7 @@ actual class PlaybackStateController(private val media3PlayerComponent: Media3Pl
 
 
     private var _isInitialized: Boolean = false
+    private var _runnable: Runnable? = null
     actual fun setItem(mediaItem: PlaybackMediaItem) {
         media3PlayerComponent.setMediaItem(mediaItem)
     }
@@ -19,28 +20,30 @@ actual class PlaybackStateController(private val media3PlayerComponent: Media3Pl
     actual fun initPlayer(callback: (Long, Long) -> Unit, playbackState: (PlaybackState) -> Unit) {
         if (!_isInitialized) {
             media3PlayerComponent.initPlayer()
-            media3PlayerComponent.setControllerListener(PlaybackControllerListener(playbackState))
-            val handler = Handler(Looper.getMainLooper())
-            val runnable = object : Runnable {
-                override fun run() {
-                    if (media3PlayerComponent.getMediaController() != null &&
-                        media3PlayerComponent.getMediaController()?.isPlaying == true) {
-                        callback(currentPosition(), duration())
-                    }
-                    val state = media3PlayerComponent.getMediaController()?.playbackState
-                    when {
-                        state == Player.STATE_BUFFERING -> playbackState(PlaybackState.Buffering)
-                        media3PlayerComponent.getMediaController() != null &&
-                                media3PlayerComponent.getMediaController()?.isPlaying == true -> {
-                            playbackState(PlaybackState.Playing)
-                                }
-                        else -> playbackState(PlaybackState.Paused)
-                    }
-                    handler.postDelayed(this, 1000)
-                }
-            }
-            handler.post(runnable)
         }
+        media3PlayerComponent.getMediaController()?.pause()
+        media3PlayerComponent.setControllerListener(PlaybackControllerListener(playbackState))
+        val handler = Handler(Looper.getMainLooper())
+        _runnable?.let(handler::removeCallbacks)
+        _runnable = object : Runnable {
+            override fun run() {
+                if (media3PlayerComponent.getMediaController() != null &&
+                    media3PlayerComponent.getMediaController()?.isPlaying == true) {
+                    callback(currentPosition(), duration())
+                }
+                val state = media3PlayerComponent.getMediaController()?.playbackState
+                when {
+                    state == Player.STATE_BUFFERING -> playbackState(PlaybackState.Buffering)
+                    media3PlayerComponent.getMediaController() != null &&
+                            media3PlayerComponent.getMediaController()?.isPlaying == true -> {
+                        playbackState(PlaybackState.Playing)
+                    }
+                    else -> playbackState(PlaybackState.Paused)
+                }
+                handler.postDelayed(this, 1000)
+            }
+        }
+        _runnable?.let { handler.postDelayed(it, 500) }
         _isInitialized = true
     }
 

@@ -79,7 +79,7 @@ fun SongInfoScreen(
     viewModel: SongInfoViewModel
 ) {
     val state by viewModel.uiState.collectAsState()
-    val playBackViewModel = remember((state as? SongInfoUIState.Success)?.vo?.id) {
+    var playBackViewModel = remember((state as? SongInfoUIState.Success)?.vo?.id) {
         (state as? SongInfoUIState.Success)?.vo?.let { vo ->
             vo.videoUrl?.let { url ->
                 getKoin().get<PlaybackViewModel>(parameters = { parametersOf(url, vo.id) })
@@ -96,22 +96,22 @@ fun SongInfoScreen(
     var scroll by remember { mutableStateOf(0f) }
 
 
-    val songTagsMaxHeight = remember(state) {
+    val songTagsMaxHeight = remember {
         34.dp * ((((state as? SongInfoUIState.Success)
             ?.vo?.songTags?.tagsWithValues?.entries?.flatMap { it.value }?.size ?: 1) - 1) / 3 + 1)
     }
-    val themesTagsMaxHeight = remember(state) {
+    val themesTagsMaxHeight = remember {
         34.dp * ((((state as? SongInfoUIState.Success)
             ?.vo?.themeTags?.tagsWithValues?.entries?.flatMap { it.value }?.size ?: 1) - 1) / 3 + 1)
     }
     val topSpacerMaxHeight = 75.dp
     val maxFunctionalityPickerSize = 90.dp
 
-    var songTagsHeight by remember(state) {
+    var songTagsHeight by remember {
         mutableStateOf(songTagsMaxHeight)
     }
 
-    var themesTagsHeight by remember(state) {
+    var themesTagsHeight by remember {
         mutableStateOf(themesTagsMaxHeight)
     }
 
@@ -460,6 +460,7 @@ fun SongInfoScreen(
     DisposableEffect(songName) {
         onDispose {
             latestViewModel?.pause()
+            playBackViewModel = null
         }
     }
 }

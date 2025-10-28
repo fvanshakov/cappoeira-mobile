@@ -18,6 +18,7 @@ class PlaybackViewModel(
 ) : ViewModel() {
     private val _playBackState = MutableStateFlow<PlaybackState>(PlaybackState.Buffering)
     private val _progressState = MutableStateFlow(0F)
+
     val playbackState = _playBackState.asStateFlow()
 
     val playBackStateUI = _playBackState.asStateFlow()
@@ -57,8 +58,8 @@ class PlaybackViewModel(
                     _playBackState.value = it
                 }
             )
-            playPause()
             playbackStateController.setItem(playbackMediaItem)
+            playPause()
         } catch (e: Exception) {
 
         }

@@ -27,11 +27,14 @@ actual class PlaybackStateController {
 
     val avPlayer: AVQueuePlayer = AVQueuePlayer()
 
+    var timer: NSTimer? = null
+
     actual fun initPlayer(
         callback: (Long, Long) -> Unit,
         playbackState: (PlaybackState) -> Unit
     ) {
-        NSTimer.scheduledTimerWithTimeInterval(1.0, true) {
+        timer?.invalidate()
+        timer = NSTimer.scheduledTimerWithTimeInterval(1.0, true) {
             callback(currentPosition(), duration())
             playbackState(playerState())
         }
